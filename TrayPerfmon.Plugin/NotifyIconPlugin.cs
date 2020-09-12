@@ -1,0 +1,80 @@
+using System;
+using System.Diagnostics;
+using System.Drawing;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+
+namespace TrayPerfmon.Plugin
+{
+    public abstract class NotifyIconPlugin : INotifyIconPlugin, IDisposable
+    {
+        protected abstract Lazy<PerformanceCounter>[] Factories { get; }
+
+        public NotifyIconPlugin(int count, int interval) {
+            _count = count;
+            _performanceCounter = new PerformanceCounter[_count];
+            _next = new float[_count];
+            _timer.Interval = interval;
+            _timer.Tick += Tick;
+        }
+
+        public void Construct() {
+            var factories = Factories;
+            for (var i = 0; i < _count; ++i) {
+                _performanceCounter[i] = factories[i].Value;
+            }
+            _notifyIcon.Visible = true;
+            _timer.Start();
+        }
+
+        void Tick(object sender, EventArgs e) {
+            for (var i = 0; i < _count; ++i) {
+                _next[i] = _performanceCounter[i].NextValue();
+            }
+            using (var graphics = Graphics.FromImage(_image)) {
+                Clear(graphics, _rectangle);
+                Draw(graphics, _next);
+            }
+            var icon = Icon.FromHandle(_image.GetHicon());
+            _notifyIcon.Icon = icon;
+            DestroyIcon(icon.Handle);
+        }
+
+        protected abstract void Clear(Graphics graphics, Rectangle rectangle);
+
+        protected abstract void Draw(Graphics graphics, float[] next);
+
+        protected virtual void Dispose(bool disposing) {
+            if (!_disposed) {
+                if (disposing) {
+                    _notifyIcon?.Dispose();
+                    _notifyIcon = null;
+                    _timer?.Dispose();
+                    _timer = null;
+                    _image?.Dispose();
+                    _image = null;
+                }
+                _disposed = true;
+            }
+        }
+
+        public void Dispose() {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected readonly int _count;
+
+        NotifyIcon _notifyIcon = new NotifyIcon();
+        Timer _timer = new Timer();
+        Bitmap _image = new Bitmap(16, 16);
+        Rectangle _rectangle = new Rectangle(0, 0, 16, 16);
+        bool _disposed = false;
+
+        readonly PerformanceCounter[] _performanceCounter;
+        readonly float[] _next;
+
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        internal static extern bool DestroyIcon(IntPtr handle);
+    }
+}

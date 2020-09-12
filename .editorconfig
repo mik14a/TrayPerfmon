@@ -1,0 +1,28 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+root = true
+
+[*]
+insert_final_newline = true
+charset = utf-8
+
+[*.{cs,vb}]
+dotnet_sort_system_directives_first = true
+
+[*.cs]
+csharp_new_line_before_open_brace = types
+csharp_new_line_before_else = false
+csharp_new_line_before_catch = false
+csharp_new_line_before_finally = false
+csharp_new_line_before_members_in_object_initializers = false
+csharp_new_line_before_members_in_anonymous_types = false
+csharp_new_line_between_query_expression_clauses = false
+csharp_indent_switch_labels = false
+
+[*.config]
+indent_style = space
+indent_size = 2
+
+[*.{cs,vb}proj]
+indent_style = space
+indent_size = 2
