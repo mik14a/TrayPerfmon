@@ -11,34 +11,20 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CpuBarGraphPlugin", "CpuBar
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
-		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B009DB92-6AB4-4AA4-831E-585E9E73E31C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B009DB92-6AB4-4AA4-831E-585E9E73E31C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B009DB92-6AB4-4AA4-831E-585E9E73E31C}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{B009DB92-6AB4-4AA4-831E-585E9E73E31C}.Debug|x64.Build.0 = Debug|Any CPU
-		{B009DB92-6AB4-4AA4-831E-585E9E73E31C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B009DB92-6AB4-4AA4-831E-585E9E73E31C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B009DB92-6AB4-4AA4-831E-585E9E73E31C}.Release|x64.ActiveCfg = Release|Any CPU
 		{B009DB92-6AB4-4AA4-831E-585E9E73E31C}.Release|x64.Build.0 = Release|Any CPU
-		{2116734A-6824-4BCE-9BA5-2803060DFC1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2116734A-6824-4BCE-9BA5-2803060DFC1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2116734A-6824-4BCE-9BA5-2803060DFC1D}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{2116734A-6824-4BCE-9BA5-2803060DFC1D}.Debug|x64.Build.0 = Debug|Any CPU
-		{2116734A-6824-4BCE-9BA5-2803060DFC1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2116734A-6824-4BCE-9BA5-2803060DFC1D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2116734A-6824-4BCE-9BA5-2803060DFC1D}.Release|x64.ActiveCfg = Release|Any CPU
 		{2116734A-6824-4BCE-9BA5-2803060DFC1D}.Release|x64.Build.0 = Release|Any CPU
-		{1EF4C5A7-4C14-4766-9166-92A3E2E59B26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1EF4C5A7-4C14-4766-9166-92A3E2E59B26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1EF4C5A7-4C14-4766-9166-92A3E2E59B26}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{1EF4C5A7-4C14-4766-9166-92A3E2E59B26}.Debug|x64.Build.0 = Debug|Any CPU
-		{1EF4C5A7-4C14-4766-9166-92A3E2E59B26}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1EF4C5A7-4C14-4766-9166-92A3E2E59B26}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1EF4C5A7-4C14-4766-9166-92A3E2E59B26}.Release|x64.ActiveCfg = Release|Any CPU
 		{1EF4C5A7-4C14-4766-9166-92A3E2E59B26}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
