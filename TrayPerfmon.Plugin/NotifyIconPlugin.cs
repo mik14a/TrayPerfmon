@@ -13,7 +13,7 @@ namespace TrayPerfmon.Plugin
         public NotifyIconPlugin(int count, int interval) {
             _count = count;
             _performanceCounter = new PerformanceCounter[_count];
-            _next = new float[_count];
+            _value = new float[_count];
             _timer.Interval = interval;
             _timer.Tick += Tick;
         }
@@ -29,11 +29,11 @@ namespace TrayPerfmon.Plugin
 
         void Tick(object sender, EventArgs e) {
             for (var i = 0; i < _count; ++i) {
-                _next[i] = _performanceCounter[i].NextValue();
+                _value[i] = _performanceCounter[i].NextValue();
             }
             using (var graphics = Graphics.FromImage(_image)) {
                 Clear(graphics, _rectangle);
-                Draw(graphics, _next);
+                Draw(graphics, _value);
             }
             var icon = Icon.FromHandle(_image.GetHicon());
             _notifyIcon.Icon = icon;
@@ -42,7 +42,7 @@ namespace TrayPerfmon.Plugin
 
         protected abstract void Clear(Graphics graphics, Rectangle rectangle);
 
-        protected abstract void Draw(Graphics graphics, float[] next);
+        protected abstract void Draw(Graphics graphics, float[] value);
 
         protected virtual void Dispose(bool disposing) {
             if (!_disposed) {
@@ -72,7 +72,7 @@ namespace TrayPerfmon.Plugin
         bool _disposed = false;
 
         readonly PerformanceCounter[] _performanceCounter;
-        readonly float[] _next;
+        readonly float[] _value;
 
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
         internal static extern bool DestroyIcon(IntPtr handle);
