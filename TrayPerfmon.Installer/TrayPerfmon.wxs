@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="TrayPerfmon" Language="1033" Version="0.1.0.0" Manufacturer="mik14a" UpgradeCode="3c6c4a63-937a-4a9a-9f0c-6eb7e1e9a027">
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+    <Media Id ="1" Cabinet='TrayPerfmon.cab' EmbedCab='yes'></Media>
+
+    <Feature Id="ProductFeature" Title="TrayPerfmon" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+  </Product>
+
+  <?if $(var.Platform) = x64 ?>
+    <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+  <?else ?>
+    <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+  <?endif ?>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="$(var.PlatformProgramFilesFolder)">
+        <Directory Id="INSTALLFOLDER" Name="TrayPerfmon" />
+      </Directory>
+    </Directory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="TrayPerfmon">
+        <File Id='TrayPerfmon' Name='TrayPerfmon.exe' Source='$(var.SolutionDir)bin\$(var.Configuration)\net48\TrayPerfmon.exe' KeyPath='yes'/>
+      </Component>
+      <Component Id="TrayPerfmon.Plugin">
+        <File Id='TrayPerfmon.Plugin' Name='TrayPerfmon.Plugin.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net48\TrayPerfmon.Plugin.dll' KeyPath='yes'/>
+      </Component>
+
+      <Component Id="CpuBarGraphPlugin">
+        <File Id='CpuBarGraphPlugin' Name='CpuBarGraphPlugin.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net48\CpuBarGraphPlugin.dll' KeyPath='yes'/>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

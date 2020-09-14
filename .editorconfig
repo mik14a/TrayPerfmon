@@ -23,6 +23,10 @@ csharp_indent_switch_labels = false
 indent_style = space
 indent_size = 2
 
-[*.{cs,vb}proj]
+[*.{cs,vb,wix}proj]
+indent_style = space
+indent_size = 2
+
+[*.wxs]
 indent_style = space
 indent_size = 2
