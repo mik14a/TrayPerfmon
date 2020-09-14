@@ -28,7 +28,11 @@ namespace TrayPerfmon
             contextMenuStrip.Items.Add(new ToolStripMenuItem("E&xit", null, ExitHandler));
 
             _notifyIcon = new NotifyIcon() {
+#if DEBUG
+                Text = Application.ProductName + "(Debug)",
+#else
                 Text = Application.ProductName,
+#endif
                 Icon = Resources.Icon,
                 Visible = true,
                 ContextMenuStrip = contextMenuStrip
