@@ -15,33 +15,38 @@ namespace CpuBarGraphPlugin
     {
         protected override Lazy<PerformanceCounter>[] Factories => _factories;
 
+        const int FramesPerSecond = 15;
+        const int Samples = FramesPerSecond / 2;
+
+
         CpuBarGraph()
-            : base(Environment.ProcessorCount, 1000 / 15) {
-            _height = new int[Environment.ProcessorCount];
+            : base(Environment.ProcessorCount, 1000 / FramesPerSecond) {
+            var queue = Enumerable.Range(0, Environment.ProcessorCount).Select(_ => new Queue<float>());
+            _value = new List<Queue<float>>(queue);
         }
 
         protected override void Clear(Graphics graphics, Rectangle rectangle) {
-            using (var brush = new SolidBrush(Color.Black)) {
-                graphics.FillRectangle(brush, rectangle);
-            }
+            graphics.Clear(Color.Black);
         }
 
-        protected override void Draw(Graphics graphics, float[] next) {
+        protected override void Draw(Graphics graphics, float[] value) {
+            for (var i = 0; i < value.Length; ++i) {
+                _value[i].Enqueue(value[i]);
+                while (_value[i].Count > Samples) _value[i].Dequeue();
+            }
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            var width = 16f / next.Length;
-            for (var i = 0; i < next.Length; ++i) {
-                var brush = _range.First(range => next[i] <= range.Key).Value;
-                var x = 16f * i / next.Length;
-                var value = 16 * next[i] / 100;
-                var delta = _height[i] < value ? 1 : value < _height[i] ? -1 : 0;
-                var height = _height[i] + delta;
-                var y = 16 - height;
+            var width = 16f / _value.Count;
+            for (var i = 0; i < _value.Count; ++i) {
+                var x = 16f * i / _value.Count;
+                var average = _value[i].Average();
+                var height = 16f * average / 100f;
+                var y = 16f - height;
+                var brush = _range.First(range => average <= range.Key).Value;
                 graphics.FillRectangle(brush, x, y, width, height);
-                _height[i] = height;
             }
         }
 
-        readonly int[] _height;
+        readonly List<Queue<float>> _value;
 
         static CpuBarGraph() {
             _factories = Enumerable
@@ -50,9 +55,9 @@ namespace CpuBarGraphPlugin
                 .ToArray();
 
             _range = new KeyValuePair<int, Brush>[] {
-                new KeyValuePair<int, Brush>(50, new SolidBrush(Color.Lime)),
-                new KeyValuePair<int, Brush>(75, new SolidBrush(Color.Yellow)),
-                new KeyValuePair<int, Brush>(100, new SolidBrush(Color.Red))
+                new KeyValuePair<int, Brush>(50, Brushes.Lime),
+                new KeyValuePair<int, Brush>(75, Brushes.Yellow),
+                new KeyValuePair<int, Brush>(100, Brushes.Red)
             };
         }
 
