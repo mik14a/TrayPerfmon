@@ -25,7 +25,7 @@ namespace CpuBarGraphPlugin
             _value = new List<Queue<float>>(queue);
         }
 
-        protected override void Clear(Graphics graphics, Rectangle rectangle) {
+        protected override void Clear(Graphics graphics) {
             graphics.Clear(Color.Black);
         }
 

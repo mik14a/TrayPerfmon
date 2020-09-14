@@ -34,7 +34,7 @@ namespace TrayPerfmon.Plugin
                 _value[i] = _performanceCounter[i].NextValue();
             }
             using (var graphics = Graphics.FromImage(_image)) {
-                Clear(graphics, _rectangle);
+                Clear(graphics);
                 Draw(graphics, _value);
             }
             var icon = Icon.FromHandle(_image.GetHicon());
@@ -42,7 +42,7 @@ namespace TrayPerfmon.Plugin
             DestroyIcon(icon.Handle);
         }
 
-        protected abstract void Clear(Graphics graphics, Rectangle rectangle);
+        protected abstract void Clear(Graphics graphics);
 
         protected abstract void Draw(Graphics graphics, float[] value);
 
