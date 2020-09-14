@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -23,6 +24,7 @@ namespace TrayPerfmon.Plugin
             for (var i = 0; i < _count; ++i) {
                 _performanceCounter[i] = factories[i].Value;
             }
+            _notifyIcon.Text = GetType().Name;
             _notifyIcon.Visible = true;
             _timer.Start();
         }
