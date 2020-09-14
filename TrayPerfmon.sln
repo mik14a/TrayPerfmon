@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30503.244
@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrayPerfmon", "TrayPerfmon\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrayPerfmon.Plugin", "TrayPerfmon.Plugin\TrayPerfmon.Plugin.csproj", "{2116734A-6824-4BCE-9BA5-2803060DFC1D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CpuBarGraphPlugin", "CpuBarGraphPlugin\CpuBarGraphPlugin.csproj", "{1EF4C5A7-4C14-4766-9166-92A3E2E59B26}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{4DABDC3F-34F9-40E0-8E90-4B7CB5E73DBF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CpuBarGraphPlugin", "Plugins\CpuBarGraphPlugin\CpuBarGraphPlugin.csproj", "{7CFE1A4A-A5D0-42E5-9903-BB1ABB2BFCF4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,15 +25,18 @@ Global
 		{2116734A-6824-4BCE-9BA5-2803060DFC1D}.Debug|x64.Build.0 = Debug|Any CPU
 		{2116734A-6824-4BCE-9BA5-2803060DFC1D}.Release|x64.ActiveCfg = Release|Any CPU
 		{2116734A-6824-4BCE-9BA5-2803060DFC1D}.Release|x64.Build.0 = Release|Any CPU
-		{1EF4C5A7-4C14-4766-9166-92A3E2E59B26}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{1EF4C5A7-4C14-4766-9166-92A3E2E59B26}.Debug|x64.Build.0 = Debug|Any CPU
-		{1EF4C5A7-4C14-4766-9166-92A3E2E59B26}.Release|x64.ActiveCfg = Release|Any CPU
-		{1EF4C5A7-4C14-4766-9166-92A3E2E59B26}.Release|x64.Build.0 = Release|Any CPU
+		{7CFE1A4A-A5D0-42E5-9903-BB1ABB2BFCF4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7CFE1A4A-A5D0-42E5-9903-BB1ABB2BFCF4}.Debug|x64.Build.0 = Debug|Any CPU
+		{7CFE1A4A-A5D0-42E5-9903-BB1ABB2BFCF4}.Release|x64.ActiveCfg = Release|Any CPU
+		{7CFE1A4A-A5D0-42E5-9903-BB1ABB2BFCF4}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BC296176-91C7-46A0-B1A1-D239DC45CC80}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7CFE1A4A-A5D0-42E5-9903-BB1ABB2BFCF4} = {4DABDC3F-34F9-40E0-8E90-4B7CB5E73DBF}
 	EndGlobalSection
 EndGlobal
