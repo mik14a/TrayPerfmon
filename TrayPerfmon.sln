@@ -12,6 +12,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CpuBarGraphPlugin", "Plugin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SamplePluginCs", "Plugins\SamplePluginCs\SamplePluginCs.csproj", "{3294CEF0-9D51-4B50-9302-2B808B745318}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "SamplePluginVb", "Plugins\SamplePluginVb\SamplePluginVb.vbproj", "{BC0E5277-438E-4086-BD10-0A17F944161F}"
+EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "TrayPerfmon.Installer", "TrayPerfmon.Installer\TrayPerfmon.Installer.wixproj", "{F3B48ECB-C88A-4872-A7C4-714749608E14}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7CFE1A4A-A5D0-42E5-9903-BB1ABB2BFCF4} = {7CFE1A4A-A5D0-42E5-9903-BB1ABB2BFCF4}
@@ -41,6 +43,10 @@ Global
 		{3294CEF0-9D51-4B50-9302-2B808B745318}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3294CEF0-9D51-4B50-9302-2B808B745318}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3294CEF0-9D51-4B50-9302-2B808B745318}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC0E5277-438E-4086-BD10-0A17F944161F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC0E5277-438E-4086-BD10-0A17F944161F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC0E5277-438E-4086-BD10-0A17F944161F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC0E5277-438E-4086-BD10-0A17F944161F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F3B48ECB-C88A-4872-A7C4-714749608E14}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{F3B48ECB-C88A-4872-A7C4-714749608E14}.Release|Any CPU.ActiveCfg = Release|x64
 	EndGlobalSection
@@ -50,6 +56,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{7CFE1A4A-A5D0-42E5-9903-BB1ABB2BFCF4} = {4DABDC3F-34F9-40E0-8E90-4B7CB5E73DBF}
 		{3294CEF0-9D51-4B50-9302-2B808B745318} = {4DABDC3F-34F9-40E0-8E90-4B7CB5E73DBF}
+		{BC0E5277-438E-4086-BD10-0A17F944161F} = {4DABDC3F-34F9-40E0-8E90-4B7CB5E73DBF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BC296176-91C7-46A0-B1A1-D239DC45CC80}
