@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using TrayPerfmon.Plugin;
 
-namespace SamplePluginCs
+namespace TrayPerfmon.Plugin.SampleCs
 {
     // Export using Managed Extensibility Framework.
     [Export(typeof(INotifyIconPlugin))]

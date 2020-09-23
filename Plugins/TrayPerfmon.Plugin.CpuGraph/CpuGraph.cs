@@ -7,11 +7,11 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using TrayPerfmon.Plugin;
 
-namespace CpuBarGraphPlugin
+namespace TrayPerfmon.Plugin.CpuGraph
 {
     [Export(typeof(INotifyIconPlugin))]
     [ExportMetadata("Description", "Cpu bar graph")]
-    class CpuBarGraph : NotifyIconPlugin
+    class CpuGraph : NotifyIconPlugin
     {
         protected override Lazy<PerformanceCounter>[] Factories => _factories;
 
@@ -19,7 +19,7 @@ namespace CpuBarGraphPlugin
         const int Samples = FramesPerSecond / 2;
 
 
-        CpuBarGraph()
+        CpuGraph()
             : base(Environment.ProcessorCount, 1000 / FramesPerSecond) {
             var queue = Enumerable.Range(0, Environment.ProcessorCount).Select(_ => new Queue<float>());
             _value = new List<Queue<float>>(queue);
@@ -48,7 +48,7 @@ namespace CpuBarGraphPlugin
 
         readonly List<Queue<float>> _value;
 
-        static CpuBarGraph() {
+        static CpuGraph() {
             _factories = Enumerable
                 .Range(0, Environment.ProcessorCount)
                 .Select(index => new Lazy<PerformanceCounter>(() => CreateProcessorTime(index)))

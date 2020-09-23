@@ -8,13 +8,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrayPerfmon.Plugin", "TrayP
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{4DABDC3F-34F9-40E0-8E90-4B7CB5E73DBF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CpuBarGraphPlugin", "Plugins\CpuBarGraphPlugin\CpuBarGraphPlugin.csproj", "{7CFE1A4A-A5D0-42E5-9903-BB1ABB2BFCF4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrayPerfmon.Plugin.CpuGraph", "Plugins\TrayPerfmon.Plugin.CpuGraph\TrayPerfmon.Plugin.CpuGraph.csproj", "{7CFE1A4A-A5D0-42E5-9903-BB1ABB2BFCF4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiskQueueMonitorPlugin", "Plugins\DiskQueueMonitorPlugin\DiskQueueMonitorPlugin.csproj", "{5C373DA9-B418-4B31-B5ED-4702204BD293}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrayPerfmon.Plugin.DiskQueueMonitor", "Plugins\TrayPerfmon.Plugin.DiskQueueMonitor\TrayPerfmon.Plugin.DiskQueueMonitor.csproj", "{5C373DA9-B418-4B31-B5ED-4702204BD293}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SamplePluginCs", "Plugins\SamplePluginCs\SamplePluginCs.csproj", "{3294CEF0-9D51-4B50-9302-2B808B745318}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrayPerfmon.Plugin.SampleCs", "Plugins\TrayPerfmon.Plugin.SampleCs\TrayPerfmon.Plugin.SampleCs.csproj", "{3294CEF0-9D51-4B50-9302-2B808B745318}"
 EndProject
-Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "SamplePluginVb", "Plugins\SamplePluginVb\SamplePluginVb.vbproj", "{BC0E5277-438E-4086-BD10-0A17F944161F}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "TrayPerfmon.Plugin.SampleVb", "Plugins\TrayPerfmon.Plugin.SampleVb\TrayPerfmon.Plugin.SampleVb.vbproj", "{BC0E5277-438E-4086-BD10-0A17F944161F}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "TrayPerfmon.Installer", "TrayPerfmon.Installer\TrayPerfmon.Installer.wixproj", "{F3B48ECB-C88A-4872-A7C4-714749608E14}"
 	ProjectSection(ProjectDependencies) = postProject

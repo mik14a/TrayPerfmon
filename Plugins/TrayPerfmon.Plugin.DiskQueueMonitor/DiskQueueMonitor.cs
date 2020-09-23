@@ -7,7 +7,7 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using TrayPerfmon.Plugin;
 
-namespace DiskQueueMonitorPlugin
+namespace TrayPerfmon.Plugin.DiskQueueMonitor
 {
     [Export(typeof(INotifyIconPlugin))]
     [ExportMetadata("Description", "Disk queue monitor")]
