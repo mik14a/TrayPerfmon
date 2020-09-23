@@ -35,6 +35,10 @@
       <Component Id="CpuBarGraphPlugin">
         <File Id='CpuBarGraphPlugin' Name='CpuBarGraphPlugin.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net48\CpuBarGraphPlugin.dll' KeyPath='yes'/>
       </Component>
+      <Component Id="DiskQueueMonitorPlugin">
+        <File Id='DiskQueueMonitorPlugin' Name='DiskQueueMonitorPlugin.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net48\DiskQueueMonitorPlugin.dll' KeyPath='yes'/>
+      </Component>
+
     </ComponentGroup>
   </Fragment>
 </Wix>
