@@ -1,15 +1,12 @@
 using System;
-using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using TrayPerfmon.Plugin;
 
 namespace TrayPerfmon.Plugin.SampleCs
 {
-    // Export using Managed Extensibility Framework.
-    [Export(typeof(INotifyIconPlugin))]
-    [ExportMetadata("Description", "Sample Plugin: % Disk Read/Write Time")]
+    // Export plugin description.
+    [Plugin("SamplePluginCs", "Sample Plugin: % Disk Read/Write Time")]
     public class SamplePlugin : NotifyIconPlugin
     {
         /// <summary>

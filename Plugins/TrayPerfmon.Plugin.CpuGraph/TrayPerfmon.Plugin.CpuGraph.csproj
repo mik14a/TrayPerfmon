@@ -11,8 +11,4 @@
     <ProjectReference Include="..\..\TrayPerfmon.Plugin\TrayPerfmon.Plugin.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="System.ComponentModel.Composition" />
-  </ItemGroup>
-
 </Project>

@@ -1,13 +1,12 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace TrayPerfmon.Plugin
 {
-    public abstract class NotifyIconPlugin : INotifyIconPlugin, IDisposable
+    public abstract class NotifyIconPlugin : IPlugin, IDisposable
     {
         protected abstract Lazy<PerformanceCounter>[] Factories { get; }
 

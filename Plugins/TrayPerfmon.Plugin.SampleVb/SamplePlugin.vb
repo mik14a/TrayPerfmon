@@ -1,10 +1,7 @@
-Imports System.ComponentModel.Composition
 Imports System.Drawing
 Imports System.Drawing.Drawing2D
-Imports TrayPerfmon.Plugin
 
-<Export(GetType(INotifyIconPlugin))>
-<ExportMetadata("Description", "Sample Plugin: Memory and Paging File")>
+<Plugin("SamplePluginVb", "Sample Plugin: Memory and Paging File")>
 Public Class SamplePlugin
     Inherits NotifyIconPlugin
 

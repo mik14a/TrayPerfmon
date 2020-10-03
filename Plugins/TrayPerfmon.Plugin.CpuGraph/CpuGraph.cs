@@ -1,17 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
-using TrayPerfmon.Plugin;
 
 namespace TrayPerfmon.Plugin.CpuGraph
 {
-    [Export(typeof(INotifyIconPlugin))]
-    [ExportMetadata("Description", "Cpu bar graph")]
-    class CpuGraph : NotifyIconPlugin
+    [Plugin("CpuGraph", "Draw % processor time")]
+    public class CpuGraph : NotifyIconPlugin
     {
         protected override Lazy<PerformanceCounter>[] Factories => _factories;
 

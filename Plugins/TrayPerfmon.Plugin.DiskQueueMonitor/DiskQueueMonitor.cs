@@ -1,16 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
-using TrayPerfmon.Plugin;
 
 namespace TrayPerfmon.Plugin.DiskQueueMonitor
 {
-    [Export(typeof(INotifyIconPlugin))]
-    [ExportMetadata("Description", "Disk queue monitor")]
+    [Plugin("DiskQueueMonitor", "Disk queue monitor")]
     public class DiskQueueMonitor : NotifyIconPlugin
     {
         protected override Lazy<PerformanceCounter>[] Factories => _factories;
