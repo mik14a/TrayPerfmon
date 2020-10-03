@@ -11,7 +11,7 @@ using TrayPerfmon.Properties;
 
 namespace TrayPerfmon
 {
-    class ApplicationContext : System.Windows.Forms.ApplicationContext, IDisposable
+    class ApplicationContext : System.Windows.Forms.ApplicationContext, IPluginHost, IDisposable
     {
         static string Repository { get; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Application.ProductName);
 
