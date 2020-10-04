@@ -15,11 +15,22 @@ namespace TrayPerfmon.Plugin.CpuGraph
         const int FramesPerSecond = 15;
         const int Samples = FramesPerSecond / 2;
 
+        public string Low { get; set; } = "Lime";
 
-        CpuGraph()
+        public string Middle { get; set; } = "Yellow";
+
+        public string High { get; set; } = "Red";
+
+        public CpuGraph()
             : base(Environment.ProcessorCount, 1000 / FramesPerSecond) {
             var queue = Enumerable.Range(0, Environment.ProcessorCount).Select(_ => new Queue<float>());
             _value = new List<Queue<float>>(queue);
+            var converter = new ColorConverter();
+            _range = new KeyValuePair<int, Brush>[] {
+                new KeyValuePair<int, Brush>(50, new SolidBrush((Color)converter.ConvertFrom(Low))),
+                new KeyValuePair<int, Brush>(75, new SolidBrush((Color)converter.ConvertFrom(Middle))),
+                new KeyValuePair<int, Brush>(100, new SolidBrush((Color)converter.ConvertFrom(High)))
+            };
         }
 
         protected override void Clear(Graphics graphics) {
@@ -44,25 +55,19 @@ namespace TrayPerfmon.Plugin.CpuGraph
         }
 
         readonly List<Queue<float>> _value;
+        readonly KeyValuePair<int, Brush>[] _range;
 
         static CpuGraph() {
-            _factories = Enumerable
-                .Range(0, Environment.ProcessorCount)
-                .Select(index => new Lazy<PerformanceCounter>(() => CreateProcessorTime(index)))
-                .ToArray();
+            _factories = Enumerable.Range(0, Environment.ProcessorCount).Select(CreateFactory).ToArray();
 
-            _range = new KeyValuePair<int, Brush>[] {
-                new KeyValuePair<int, Brush>(50, Brushes.Lime),
-                new KeyValuePair<int, Brush>(75, Brushes.Yellow),
-                new KeyValuePair<int, Brush>(100, Brushes.Red)
-            };
-        }
-
-        static PerformanceCounter CreateProcessorTime(int index) {
-            return new PerformanceCounter("Processor", "% Processor Time", index.ToString(), true);
+            Lazy<PerformanceCounter> CreateFactory(int index) {
+                const string categoryName = "Processor";
+                const string counterName = "% Processor Time";
+                var instanceName = index.ToString();
+                return new Lazy<PerformanceCounter>(() => new PerformanceCounter(categoryName, counterName, instanceName, true));
+            }
         }
 
         static readonly Lazy<PerformanceCounter>[] _factories;
-        static readonly KeyValuePair<int, Brush>[] _range;
     }
 }
