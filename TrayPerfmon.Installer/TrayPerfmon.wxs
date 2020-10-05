@@ -26,17 +26,17 @@
   <Fragment>
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
       <Component Id="TrayPerfmon">
-        <File Id='TrayPerfmon' Name='TrayPerfmon.exe' Source='$(var.SolutionDir)bin\$(var.Configuration)\net48\TrayPerfmon.exe' KeyPath='yes'/>
+        <File Id='TrayPerfmon' Name='TrayPerfmon.exe' Source='$(var.SolutionDir)bin\$(var.Configuration)\net452\TrayPerfmon.exe' KeyPath='yes'/>
       </Component>
       <Component Id="TrayPerfmon.Plugin">
-        <File Id='TrayPerfmon.Plugin' Name='TrayPerfmon.Plugin.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net48\TrayPerfmon.Plugin.dll' KeyPath='yes'/>
+        <File Id='TrayPerfmon.Plugin' Name='TrayPerfmon.Plugin.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net452\TrayPerfmon.Plugin.dll' KeyPath='yes'/>
       </Component>
 
       <Component Id="TrayPerfmon.Plugin.CpuGraph">
-        <File Id='TrayPerfmon.Plugin.CpuGraph' Name='TrayPerfmon.Plugin.CpuGraph.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net48\TrayPerfmon.Plugin.CpuGraph.dll' KeyPath='yes'/>
+        <File Id='TrayPerfmon.Plugin.CpuGraph' Name='TrayPerfmon.Plugin.CpuGraph.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net452\TrayPerfmon.Plugin.CpuGraph.dll' KeyPath='yes'/>
       </Component>
       <Component Id="TrayPerfmon.Plugin.DiskQueueMonitor">
-        <File Id='TrayPerfmon.Plugin.DiskQueueMonitor' Name='TrayPerfmon.Plugin.DiskQueueMonitor.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net48\TrayPerfmon.Plugin.DiskQueueMonitor.dll' KeyPath='yes'/>
+        <File Id='TrayPerfmon.Plugin.DiskQueueMonitor' Name='TrayPerfmon.Plugin.DiskQueueMonitor.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net452\TrayPerfmon.Plugin.DiskQueueMonitor.dll' KeyPath='yes'/>
       </Component>
 
     </ComponentGroup>

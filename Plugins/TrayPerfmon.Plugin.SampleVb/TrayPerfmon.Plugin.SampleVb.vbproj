@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>TrayPerfmon.Plugin.SampleVb</RootNamespace>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net452</TargetFramework>
     <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
     <FileVersion>0.1.0.0</FileVersion>
     <Version>0.1.0</Version>
