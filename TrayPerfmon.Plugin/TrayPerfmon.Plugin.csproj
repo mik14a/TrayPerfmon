@@ -11,4 +11,8 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\Slight\Source\System.ComponentModel.Plugin.cs" Link="System.ComponentModel.Plugin.cs" />
+  </ItemGroup>
+
 </Project>

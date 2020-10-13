@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Plugin;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace TrayPerfmon
         static string Repository { get; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Application.ProductName);
 
         public ApplicationContext() {
-            var plugins = PluginInfo<NotifyIconPlugin>.LoadPlugins(Application.StartupPath).ToDictionary(p => PluginName(p.Type));
+            var plugins = PluginInfo<NotifyIconPlugin>.LoadPlugins(Application.StartupPath).ToDictionary(p => p.Name);
             var toolStripItems = plugins.Select(p => new ToolStripMenuItem(p.Key, null, PluginSelectHandler) {
                     Tag = p.Value
                 })
@@ -52,10 +53,6 @@ namespace TrayPerfmon
                         }
                     }
                 }
-            }
-
-            string PluginName(Type type) {
-                return type.GetCustomAttribute<PluginAttribute>(true)?.Name;
             }
         }
 

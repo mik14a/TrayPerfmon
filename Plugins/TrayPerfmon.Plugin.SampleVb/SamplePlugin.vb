@@ -1,3 +1,4 @@
+Imports System.ComponentModel.Plugin
 Imports System.Drawing
 Imports System.Drawing.Drawing2D
 
