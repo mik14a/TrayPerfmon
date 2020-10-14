@@ -8,12 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="System.Windows.Forms" />
+    <ProjectReference Include="..\..\TrayPerfmon.Plugin\TrayPerfmon.Plugin.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Slight\Source\System.Collections.Generic.KeyValuePair.cs" Link="System.Collections.Generic.KeyValuePair.cs" />
-    <Compile Include="..\Slight\Source\System.ComponentModel.Plugin.cs" Link="System.ComponentModel.Plugin.cs" />
+    <Reference Include="Microsoft.VisualBasic" />
   </ItemGroup>
 
 </Project>
