@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Text.Humanize;
 using Microsoft.VisualBasic.Devices;
 
 namespace TrayPerfmon.Plugin.MemoryGrapth
@@ -14,14 +15,27 @@ namespace TrayPerfmon.Plugin.MemoryGrapth
     {
         protected override Lazy<PerformanceCounter>[] Factories => _factories;
 
+        protected override string BalloonTipText {
+            get {
+                var committed = (Committed * 100).ToString("0.00");
+                var use = (Use * 100).ToString("0.00");
+                var available = ((long)_available).ToString(Multiple.Binary);
+                var max = ((long)_max).ToString(Multiple.Binary);
+                return $"{committed}% Committed / {use}% Use ({available} / {max})";
+            }
+        }
+
         const int FramesPerSecond = 15;
-        const int Samples = FramesPerSecond / 2;
 
         public string Low { get; set; } = "Lime";
 
         public string Middle { get; set; } = "Yellow";
 
         public string High { get; set; } = "Red";
+
+        protected float Committed { get; private set; }
+
+        protected float Use { get; private set; }
 
         public MemoryMeter()
             : base(2, 1000 / FramesPerSecond) {
@@ -40,12 +54,13 @@ namespace TrayPerfmon.Plugin.MemoryGrapth
         }
 
         protected override void Draw(Graphics graphics, float[] value) {
+            _available = (ulong)value[1];
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            var committed = value[0] / 100f;
-            var available = 1f - value[1] / _max;
+            Committed = value[0] / 100f;
+            Use = 1f - (float)_available / _max;
             var bounds = graphics.VisibleClipBounds;
-            DrawMeter(graphics, committed, bounds);
-            DrawMeter(graphics, available, RectangleF.Inflate(bounds, -bounds.Width / 5, -bounds.Height / 5));
+            DrawMeter(graphics, Committed, bounds);
+            DrawMeter(graphics, Use, RectangleF.Inflate(bounds, -bounds.Width / 5, -bounds.Height / 5));
 
             void DrawMeter(Graphics g, float v, RectangleF r) {
                 var brush = _range.First(range => v <= range.Key).Value;
@@ -54,7 +69,7 @@ namespace TrayPerfmon.Plugin.MemoryGrapth
             }
         }
 
-        float _max;
+        ulong _available, _max;
         readonly KeyValuePair<float, Brush>[] _range;
 
         static MemoryMeter() {

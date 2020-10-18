@@ -14,6 +14,7 @@
   <ItemGroup>
     <Compile Include="..\Slight\Source\System.Collections.Generic.KeyValuePair.cs" Link="System.Collections.Generic.KeyValuePair.cs" />
     <Compile Include="..\Slight\Source\System.ComponentModel.Plugin.cs" Link="System.ComponentModel.Plugin.cs" />
+    <Compile Include="..\Slight\Source\System.Text.Humanize.cs" Link="System.Text.Humanize.cs" />
   </ItemGroup>
 
 </Project>

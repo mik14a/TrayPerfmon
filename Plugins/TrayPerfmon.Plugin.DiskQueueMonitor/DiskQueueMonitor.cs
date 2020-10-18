@@ -13,6 +13,13 @@ namespace TrayPerfmon.Plugin.DiskQueueMonitor
     {
         protected override Lazy<PerformanceCounter>[] Factories => _factories;
 
+        protected override string BalloonTipText {
+            get {
+                var average = _queue.Select(q => q.Average()).ToArray();
+                return $"Avg. Disk Queue Length Read [{average[0]}]/ Write [{average[1]}]";
+            }
+        }
+
         const int FramesPerSecond = 15;
         const int Samples = FramesPerSecond * 2;
 

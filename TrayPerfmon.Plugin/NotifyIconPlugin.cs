@@ -11,6 +11,8 @@ namespace TrayPerfmon.Plugin
     {
         protected abstract Lazy<PerformanceCounter>[] Factories { get; }
 
+        protected virtual string BalloonTipText { get; } = string.Empty;
+
         public NotifyIconPlugin(int count, int interval) {
             _count = count;
             _performanceCounter = new PerformanceCounter[_count];
@@ -26,6 +28,7 @@ namespace TrayPerfmon.Plugin
             }
             _notifyIcon.Text = GetType().Name;
             _notifyIcon.Visible = true;
+            _notifyIcon.Click += Click;
             _timer.Start();
         }
 
@@ -40,6 +43,12 @@ namespace TrayPerfmon.Plugin
             var icon = Icon.FromHandle(_image.GetHicon());
             _notifyIcon.Icon = icon;
             DestroyIcon(icon.Handle);
+        }
+
+        void Click(object sender, EventArgs e) {
+            if (!string.IsNullOrWhiteSpace(BalloonTipText)) {
+                _notifyIcon.ShowBalloonTip(1000, GetType().Name, BalloonTipText, ToolTipIcon.Info);
+            }
         }
 
         protected abstract void Clear(Graphics graphics);
