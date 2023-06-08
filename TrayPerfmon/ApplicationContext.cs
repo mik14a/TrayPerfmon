@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+
 using TrayPerfmon.Plugin;
 using TrayPerfmon.Properties;
 
@@ -19,8 +20,8 @@ namespace TrayPerfmon
         public ApplicationContext() {
             var plugins = PluginInfo<NotifyIconPlugin>.LoadPlugins(Application.StartupPath).ToDictionary(p => p.Name);
             var toolStripItems = plugins.Select(p => new ToolStripMenuItem(p.Key, null, PluginSelectHandler) {
-                    Tag = p.Value
-                })
+                Tag = p.Value
+            })
                 .ToArray();
             var contextMenuStrip = new ContextMenuStrip();
             contextMenuStrip.Items.AddRange(toolStripItems);

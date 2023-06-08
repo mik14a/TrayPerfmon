@@ -6,9 +6,10 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text.Humanize;
+
 using Microsoft.VisualBasic.Devices;
 
-namespace TrayPerfmon.Plugin.MemoryGrapth
+namespace TrayPerfmon.Plugin.MemoryMeter
 {
     [Plugin("MemoryMeter", "Display memory usage")]
     public class MemoryMeter : NotifyIconPlugin
