@@ -3,10 +3,10 @@ using System.Windows.Forms;
 
 namespace TrayPerfmon
 {
-    class Program
+    internal class Program
     {
         [STAThread]
-        static void Main() {
+        private static void Main() {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new ApplicationContext());

@@ -13,16 +13,15 @@ using TrayPerfmon.Properties;
 
 namespace TrayPerfmon
 {
-    class ApplicationContext : System.Windows.Forms.ApplicationContext, IPluginHost, IDisposable
+    internal class ApplicationContext : System.Windows.Forms.ApplicationContext, IPluginHost, IDisposable
     {
-        static string Repository { get; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Application.ProductName);
+        private static string Repository { get; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Application.ProductName);
 
         public ApplicationContext() {
             var plugins = PluginInfo<NotifyIconPlugin>.LoadPlugins(Application.StartupPath).ToDictionary(p => p.Name);
             var toolStripItems = plugins.Select(p => new ToolStripMenuItem(p.Key, null, PluginSelectHandler) {
                 Tag = p.Value
-            })
-                .ToArray();
+            }).ToArray();
             var contextMenuStrip = new ContextMenuStrip();
             contextMenuStrip.Items.AddRange(toolStripItems);
             contextMenuStrip.Items.Add(new ToolStripSeparator());
@@ -57,7 +56,7 @@ namespace TrayPerfmon
             }
         }
 
-        void PluginSelectHandler(object sender, EventArgs e) {
+        private void PluginSelectHandler(object sender, EventArgs e) {
             Debug.Assert(sender is ToolStripMenuItem);
             var toolStripMenuItem = sender as ToolStripMenuItem;
             var pluginInfo = toolStripMenuItem.Tag as PluginInfo<NotifyIconPlugin>;
@@ -66,8 +65,8 @@ namespace TrayPerfmon
             _plugins.Add(plugin);
         }
 
-        void SaveHandler(object sender, EventArgs e) {
-            if (!Directory.Exists(Repository)) Directory.CreateDirectory(Repository);
+        private void SaveHandler(object sender, EventArgs e) {
+            if (!Directory.Exists(Repository)) _ = Directory.CreateDirectory(Repository);
             foreach (var plugin in _plugins) {
                 var name = plugin.GetType().GetCustomAttribute<PluginAttribute>().Name;
                 var path = Path.Combine(Repository, name + ".xml");
@@ -78,9 +77,7 @@ namespace TrayPerfmon
             }
         }
 
-        void ExitHandler(object sender, EventArgs e) {
-            ExitThread();
-        }
+        private void ExitHandler(object sender, EventArgs e) => ExitThread();
 
         protected override void Dispose(bool disposing) {
             if (disposing) {
@@ -94,7 +91,7 @@ namespace TrayPerfmon
             base.Dispose(disposing);
         }
 
-        NotifyIcon _notifyIcon;
-        readonly List<NotifyIconPlugin> _plugins = new List<NotifyIconPlugin>();
+        private NotifyIcon _notifyIcon;
+        private readonly List<NotifyIconPlugin> _plugins = new List<NotifyIconPlugin>();
     }
 }
