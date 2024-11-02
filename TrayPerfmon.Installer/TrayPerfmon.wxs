@@ -26,20 +26,20 @@
   <Fragment>
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
       <Component Id="TrayPerfmon">
-        <File Id='TrayPerfmon' Name='TrayPerfmon.exe' Source='$(var.SolutionDir)bin\$(var.Configuration)\net48\TrayPerfmon.exe' KeyPath='yes'/>
+        <File Id='TrayPerfmon' Name='TrayPerfmon.exe' Source='$(var.SolutionDir)bin\$(var.Configuration)\net8.0-windows\TrayPerfmon.exe' KeyPath='yes'/>
       </Component>
       <Component Id="TrayPerfmon.Plugin">
-        <File Id='TrayPerfmon.Plugin' Name='TrayPerfmon.Plugin.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net48\TrayPerfmon.Plugin.dll' KeyPath='yes'/>
+        <File Id='TrayPerfmon.Plugin' Name='TrayPerfmon.Plugin.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net8.0-windows\TrayPerfmon.Plugin.dll' KeyPath='yes'/>
       </Component>
 
       <Component Id="TrayPerfmon.Plugin.CpuGraph">
-        <File Id='TrayPerfmon.Plugin.CpuGraph' Name='TrayPerfmon.Plugin.CpuGraph.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net48\TrayPerfmon.Plugin.CpuGraph.dll' KeyPath='yes'/>
+        <File Id='TrayPerfmon.Plugin.CpuGraph' Name='TrayPerfmon.Plugin.CpuGraph.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net8.0-windows\TrayPerfmon.Plugin.CpuGraph.dll' KeyPath='yes'/>
       </Component>
       <Component Id="TrayPerfmon.Plugin.DiskQueueMonitor">
-        <File Id='TrayPerfmon.Plugin.DiskQueueMonitor' Name='TrayPerfmon.Plugin.DiskQueueMonitor.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net48\TrayPerfmon.Plugin.DiskQueueMonitor.dll' KeyPath='yes'/>
+        <File Id='TrayPerfmon.Plugin.DiskQueueMonitor' Name='TrayPerfmon.Plugin.DiskQueueMonitor.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net8.0-windows\TrayPerfmon.Plugin.DiskQueueMonitor.dll' KeyPath='yes'/>
       </Component>
       <Component Id="TrayPerfmon.Plugin.MemoryMeter">
-        <File Id='TrayPerfmon.Plugin.MemoryMeter' Name='TrayPerfmon.Plugin.MemoryMeter.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net48\TrayPerfmon.Plugin.MemoryMeter.dll' KeyPath='yes'/>
+        <File Id='TrayPerfmon.Plugin.MemoryMeter' Name='TrayPerfmon.Plugin.MemoryMeter.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net8.0-windows\TrayPerfmon.Plugin.MemoryMeter.dll' KeyPath='yes'/>
       </Component>
 
     </ComponentGroup>

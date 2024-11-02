@@ -2,7 +2,10 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
+    <ApplicationHighDpiMode>DpiUnawareGdiScaled</ApplicationHighDpiMode>
     <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
     <FileVersion>0.1.0.0</FileVersion>
     <Version>0.1.0</Version>
@@ -19,7 +22,6 @@
 
   <ItemGroup>
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
 
   <ItemGroup>

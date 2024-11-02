@@ -1,18 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
+    <ApplicationHighDpiMode>DpiUnawareGdiScaled</ApplicationHighDpiMode>
     <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
     <FileVersion>0.1.0.0</FileVersion>
     <Version>0.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="System.Windows.Forms" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\Bits\Source\System.Collections.Generic.KeyValuePair.cs" Link="System.Collections.Generic.KeyValuePair.cs" />
     <Compile Include="..\Bits\Source\System.ComponentModel.Plugin.cs" Link="System.ComponentModel.Plugin.cs" />
     <Compile Include="..\Bits\Source\System.Text.Humanize.cs" Link="System.Text.Humanize.cs" />
   </ItemGroup>
