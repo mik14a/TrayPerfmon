@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace TrayPerfmon.Plugin
 {
-    public abstract class NotifyIconPlugin : IPlugin, IDisposable
+    public abstract partial class NotifyIconPlugin : IPlugin, IDisposable
     {
         protected abstract Lazy<PerformanceCounter>[] Factories { get; }
 
@@ -59,11 +59,8 @@ namespace TrayPerfmon.Plugin
             if (!_disposed) {
                 if (disposing) {
                     _notifyIcon?.Dispose();
-                    _notifyIcon = null;
                     _timer?.Dispose();
-                    _timer = null;
                     _image?.Dispose();
-                    _image = null;
                 }
                 _disposed = true;
             }
@@ -74,18 +71,17 @@ namespace TrayPerfmon.Plugin
             GC.SuppressFinalize(this);
         }
 
-        protected readonly int _count;
-
-        NotifyIcon _notifyIcon = new NotifyIcon();
-        Timer _timer = new Timer();
-        Bitmap _image = new Bitmap(16, 16);
-        Rectangle _rectangle = new Rectangle(0, 0, 16, 16);
-        bool _disposed = false;
-
+        readonly NotifyIcon _notifyIcon = new();
+        readonly Timer _timer = new();
+        readonly Bitmap _image = new(16, 16);
         readonly PerformanceCounter[] _performanceCounter;
         readonly float[] _value;
 
-        [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        internal static extern bool DestroyIcon(IntPtr handle);
+        protected readonly int _count;
+        bool _disposed = false;
+
+        [LibraryImport("User32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static partial bool DestroyIcon(IntPtr handle);
     }
 }

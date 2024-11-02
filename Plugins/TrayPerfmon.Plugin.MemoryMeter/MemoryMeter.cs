@@ -43,11 +43,11 @@ namespace TrayPerfmon.Plugin.MemoryMeter
             var computerInfo = new ComputerInfo();
             _max = computerInfo.TotalPhysicalMemory;
             var converter = new ColorConverter();
-            _range = new[] {
+            _range = [
                 KeyValuePair.Create(0.5f, new SolidBrush((Color)converter.ConvertFrom(Low)) as Brush),
                 KeyValuePair.Create(0.75f, new SolidBrush((Color)converter.ConvertFrom(Middle)) as Brush),
                 KeyValuePair.Create(1f, new SolidBrush((Color)converter.ConvertFrom(High)) as Brush)
-            };
+            ];
         }
 
         protected override void Clear(Graphics graphics) {
@@ -70,7 +70,8 @@ namespace TrayPerfmon.Plugin.MemoryMeter
             }
         }
 
-        ulong _available, _max;
+        ulong _available;
+        readonly ulong _max;
         readonly KeyValuePair<float, Brush>[] _range;
 
         static MemoryMeter() {

@@ -57,8 +57,8 @@ namespace TrayPerfmon.Plugin.SampleCs
         static SamplePlugin() {
             // Open 'Server Explorer' window and find your own performance counter in local machine
             _factories = new Lazy<PerformanceCounter>[] {
-                new Lazy<PerformanceCounter>(() => new PerformanceCounter("PhysicalDisk", "% Disk Read Time", "_Total", true)),
-                new Lazy<PerformanceCounter>(() => new PerformanceCounter("PhysicalDisk", "% Disk Write Time", "_Total", true)),
+                new(() => new PerformanceCounter("PhysicalDisk", "% Disk Read Time", "_Total", true)),
+                new(() => new PerformanceCounter("PhysicalDisk", "% Disk Write Time", "_Total", true)),
             };
             // Create Read/Write color brush
             _brushes = new Brush[] { Brushes.Cyan, Brushes.Magenta };
@@ -66,6 +66,7 @@ namespace TrayPerfmon.Plugin.SampleCs
 
         /// <summary>Static performance counter factories.</summary>
         static readonly Lazy<PerformanceCounter>[] _factories;
+
         /// <summary>Draw brush for disk access.</summary>
         static readonly Brush[] _brushes;
     }

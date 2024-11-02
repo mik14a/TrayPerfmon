@@ -28,9 +28,9 @@ namespace TrayPerfmon.Plugin.CpuGraph
             _value = new List<Queue<float>>(queue);
             var converter = new ColorConverter();
             _range = new KeyValuePair<int, Brush>[] {
-                new KeyValuePair<int, Brush>(50, new SolidBrush((Color)converter.ConvertFrom(Low))),
-                new KeyValuePair<int, Brush>(75, new SolidBrush((Color)converter.ConvertFrom(Middle))),
-                new KeyValuePair<int, Brush>(100, new SolidBrush((Color)converter.ConvertFrom(High)))
+                new(50, new SolidBrush((Color)converter.ConvertFrom(Low))),
+                new(75, new SolidBrush((Color)converter.ConvertFrom(Middle))),
+                new(100, new SolidBrush((Color)converter.ConvertFrom(High)))
             };
         }
 

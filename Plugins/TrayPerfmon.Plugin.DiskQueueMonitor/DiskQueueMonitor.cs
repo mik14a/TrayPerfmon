@@ -41,8 +41,11 @@ namespace TrayPerfmon.Plugin.DiskQueueMonitor
         protected override void Draw(Graphics graphics, float[] value) {
             for (var rw = 0; rw < 2; ++rw) {
                 _queue[rw].Enqueue(value[rw]);
-                while (Samples < _queue[rw].Count) _queue[rw].Dequeue();
+                while (Samples < _queue[rw].Count) {
+                    _ = _queue[rw].Dequeue();
+                }
             }
+
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
             var bounds = graphics.VisibleClipBounds;
             var start = (int)bounds.X;
@@ -55,24 +58,24 @@ namespace TrayPerfmon.Plugin.DiskQueueMonitor
                 var draw = _queue[rw].Reverse().Take(count).Select(q => q / limit);
                 var disp = draw.Select(q => float.IsNaN(q) ? 0f : Math.Min(1f, q));
                 if (1f < limit) {
-                    var one = center + (1f / limit) * delta;
+                    var one = center + 1f / limit * delta;
                     graphics.DrawLine(Pens.Gray, start, one, start + count, one);
                 }
+
                 var pen = 3f < average ? Pens.Red : 1f < average ? Pens.Yellow : Pens.Lime;
                 var points = Enumerable.Range(start, count).Reverse().Zip(disp, (x, y) => new PointF(x, center + y * delta)).ToArray();
                 graphics.DrawLines(pen, points);
             }
         }
 
-        Queue<float>[] _queue;
+        readonly Queue<float>[] _queue;
 
         static DiskQueueMonitor() {
             _factories = new Lazy<PerformanceCounter>[] {
-                new Lazy<PerformanceCounter>(() => new PerformanceCounter("PhysicalDisk", "Avg. Disk Read Queue Length", "_Total", true)),
-                new Lazy<PerformanceCounter>(() => new PerformanceCounter("PhysicalDisk", "Avg. Disk Write Queue Length", "_Total", true)),
+                new(() => new PerformanceCounter("PhysicalDisk", "Avg. Disk Read Queue Length", "_Total", true)),
+                new(() => new PerformanceCounter("PhysicalDisk", "Avg. Disk Write Queue Length", "_Total", true)),
             };
         }
-
 
         static readonly Lazy<PerformanceCounter>[] _factories;
     }

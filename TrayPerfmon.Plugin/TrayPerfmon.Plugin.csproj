@@ -8,6 +8,7 @@
     <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
     <FileVersion>0.1.0.0</FileVersion>
     <Version>0.1.0</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
