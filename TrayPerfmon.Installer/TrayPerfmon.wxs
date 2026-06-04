@@ -41,6 +41,9 @@
       <Component Id="TrayPerfmon.Plugin.MemoryMeter">
         <File Id='TrayPerfmon.Plugin.MemoryMeter' Name='TrayPerfmon.Plugin.MemoryMeter.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net8.0-windows\TrayPerfmon.Plugin.MemoryMeter.dll' KeyPath='yes'/>
       </Component>
+      <Component Id="TrayPerfmon.Plugin.GpuMemory">
+        <File Id='TrayPerfmon.Plugin.GpuMemory' Name='TrayPerfmon.Plugin.GpuMemory.dll' Source='$(var.SolutionDir)bin\$(var.Configuration)\net8.0-windows\TrayPerfmon.Plugin.GpuMemory.dll' KeyPath='yes'/>
+      </Component>
 
     </ComponentGroup>
   </Fragment>

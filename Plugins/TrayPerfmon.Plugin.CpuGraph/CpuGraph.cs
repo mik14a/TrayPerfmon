@@ -23,15 +23,28 @@ namespace TrayPerfmon.Plugin.CpuGraph
         public string High { get; set; } = "Red";
 
         public CpuGraph()
-            : base(Environment.ProcessorCount, 1000 / FramesPerSecond) {
+            : base(Environment.ProcessorCount, false, 1000 / FramesPerSecond) {
             var queue = Enumerable.Range(0, Environment.ProcessorCount).Select(_ => new Queue<float>());
             _value = new List<Queue<float>>(queue);
+        }
+
+        protected override void ApplySettings() {
+            const string categoryName = "Processor";
+            const string counterName = "% Processor Time";
+            _factories = Enumerable.Range(0, _count)
+                .Select(index => new Lazy<PerformanceCounter>(() => new PerformanceCounter(categoryName, counterName, index.ToString(), true)))
+                .ToArray();
+            if (_range != null) {
+                foreach (var range in _range) {
+                    range.Value.Dispose();
+                }
+            }
             var converter = new ColorConverter();
-            _range = new KeyValuePair<int, Brush>[] {
+            _range = [
                 new(50, new SolidBrush((Color)converter.ConvertFrom(Low))),
                 new(75, new SolidBrush((Color)converter.ConvertFrom(Middle))),
                 new(100, new SolidBrush((Color)converter.ConvertFrom(High)))
-            };
+            ];
         }
 
         protected override void Clear(Graphics graphics) {
@@ -55,20 +68,17 @@ namespace TrayPerfmon.Plugin.CpuGraph
             }
         }
 
-        readonly List<Queue<float>> _value;
-        readonly KeyValuePair<int, Brush>[] _range;
-
-        static CpuGraph() {
-            _factories = Enumerable.Range(0, Environment.ProcessorCount).Select(CreateFactory).ToArray();
-
-            Lazy<PerformanceCounter> CreateFactory(int index) {
-                const string categoryName = "Processor";
-                const string counterName = "% Processor Time";
-                var instanceName = index.ToString();
-                return new Lazy<PerformanceCounter>(() => new PerformanceCounter(categoryName, counterName, instanceName, true));
+        protected override void Dispose(bool disposing) {
+            if (disposing) {
+                foreach (var range in _range) {
+                    range.Value.Dispose();
+                }
             }
+            base.Dispose(disposing);
         }
 
-        static readonly Lazy<PerformanceCounter>[] _factories;
+        readonly List<Queue<float>> _value;
+        KeyValuePair<int, Brush>[] _range;
+        Lazy<PerformanceCounter>[] _factories;
     }
 }

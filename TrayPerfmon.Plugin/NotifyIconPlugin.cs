@@ -13,8 +13,14 @@ namespace TrayPerfmon.Plugin
 
         protected virtual string BalloonTipText { get; } = string.Empty;
 
-        public NotifyIconPlugin(int count, int interval) {
+        protected virtual void ShowSettings() { }
+        protected virtual void ApplySettings() { }
+        protected abstract void Clear(Graphics graphics);
+        protected abstract void Draw(Graphics graphics, float[] value);
+
+        public NotifyIconPlugin(int count, bool hasSettings, int interval) {
             _count = count;
+            _hasSettings = hasSettings;
             _performanceCounter = new PerformanceCounter[_count];
             _value = new float[_count];
             _timer.Interval = interval;
@@ -22,14 +28,26 @@ namespace TrayPerfmon.Plugin
         }
 
         public void Construct() {
-            var factories = Factories;
-            for (var i = 0; i < _count; ++i) {
-                _performanceCounter[i] = factories[i].Value;
-            }
+            Apply();
             _notifyIcon.Text = GetType().Name;
             _notifyIcon.Visible = true;
-            _notifyIcon.Click += Click;
+            _notifyIcon.MouseClick += NotifyIconMouseClick;
             _timer.Start();
+        }
+
+        public void Apply() {
+            ApplySettings();
+            for (var i = 0; i < _count; ++i) {
+                _performanceCounter[i]?.Dispose();
+            }
+            for (var i = 0; i < _count; ++i) {
+                _performanceCounter[i] = Factories[i]?.Value;
+            }
+        }
+
+        public void Dispose() {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
 
         void Tick(object sender, EventArgs e) {
@@ -40,20 +58,28 @@ namespace TrayPerfmon.Plugin
                 Clear(graphics);
                 Draw(graphics, _value);
             }
-            var icon = Icon.FromHandle(_image.GetHicon());
-            _notifyIcon.Icon = icon;
-            DestroyIcon(icon.Handle);
-        }
-
-        void Click(object sender, EventArgs e) {
-            if (!string.IsNullOrWhiteSpace(BalloonTipText)) {
-                _notifyIcon.ShowBalloonTip(1000, GetType().Name, BalloonTipText, ToolTipIcon.Info);
+            var handle = _image.GetHicon();
+            try {
+                using var icon = Icon.FromHandle(handle);
+                var previous = _notifyIcon.Icon;
+                _notifyIcon.Icon = (Icon)icon.Clone();
+                previous?.Dispose();
+            } finally {
+                DestroyIcon(handle);
             }
         }
 
-        protected abstract void Clear(Graphics graphics);
-
-        protected abstract void Draw(Graphics graphics, float[] value);
+        void NotifyIconMouseClick(object sender, MouseEventArgs e) {
+            if (e.Button == MouseButtons.Left) {
+                if (_hasSettings) {
+                    ShowSettings();
+                }
+            } else if (e.Button == MouseButtons.Right) {
+                if (!string.IsNullOrWhiteSpace(BalloonTipText)) {
+                    _notifyIcon.ShowBalloonTip(1000, GetType().Name, BalloonTipText, ToolTipIcon.Info);
+                }
+            }
+        }
 
         protected virtual void Dispose(bool disposing) {
             if (!_disposed) {
@@ -61,14 +87,12 @@ namespace TrayPerfmon.Plugin
                     _notifyIcon?.Dispose();
                     _timer?.Dispose();
                     _image?.Dispose();
+                    foreach (var performanceCounter in _performanceCounter) {
+                        performanceCounter?.Dispose();
+                    }
                 }
                 _disposed = true;
             }
-        }
-
-        public void Dispose() {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
 
         readonly NotifyIcon _notifyIcon = new();
@@ -78,6 +102,8 @@ namespace TrayPerfmon.Plugin
         readonly float[] _value;
 
         protected readonly int _count;
+        protected readonly bool _hasSettings;
+
         bool _disposed = false;
 
         [LibraryImport("User32.dll")]

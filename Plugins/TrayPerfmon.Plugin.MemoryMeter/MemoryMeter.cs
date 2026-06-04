@@ -29,9 +29,7 @@ namespace TrayPerfmon.Plugin.MemoryMeter
         const int FramesPerSecond = 15;
 
         public string Low { get; set; } = "Lime";
-
         public string Middle { get; set; } = "Yellow";
-
         public string High { get; set; } = "Red";
 
         protected float Committed { get; private set; }
@@ -39,9 +37,21 @@ namespace TrayPerfmon.Plugin.MemoryMeter
         protected float Use { get; private set; }
 
         public MemoryMeter()
-            : base(2, 1000 / FramesPerSecond) {
-            var computerInfo = new ComputerInfo();
-            _max = computerInfo.TotalPhysicalMemory;
+            : base(2, false, 1000 / FramesPerSecond) {
+            _max = new ComputerInfo().TotalPhysicalMemory;
+        }
+
+        protected override void ApplySettings() {
+            const string categoryName = "Memory";
+            _factories = [
+                new Lazy<PerformanceCounter>(() => new PerformanceCounter(categoryName, "% Committed Bytes In Use", true)),
+                new Lazy<PerformanceCounter>(() => new PerformanceCounter(categoryName, "Available Bytes", true))
+            ];
+            if (_range != null) {
+                foreach (var range in _range) {
+                    range.Value.Dispose();
+                }
+            }
             var converter = new ColorConverter();
             _range = [
                 KeyValuePair.Create(0.5f, new SolidBrush((Color)converter.ConvertFrom(Low)) as Brush),
@@ -70,18 +80,18 @@ namespace TrayPerfmon.Plugin.MemoryMeter
             }
         }
 
-        ulong _available;
-        readonly ulong _max;
-        readonly KeyValuePair<float, Brush>[] _range;
-
-        static MemoryMeter() {
-            const string categoryName = "Memory";
-            _factories = new[] {
-                new Lazy<PerformanceCounter>(() => new PerformanceCounter(categoryName, "% Committed Bytes In Use", true)),
-                new Lazy<PerformanceCounter>(() => new PerformanceCounter(categoryName, "Available Bytes", true))
-            };
+        protected override void Dispose(bool disposing) {
+            if (disposing && _range != null) {
+                foreach (var range in _range) {
+                    range.Value.Dispose();
+                }
+            }
+            base.Dispose(disposing);
         }
 
-        static readonly Lazy<PerformanceCounter>[] _factories;
+        ulong _available;
+        readonly ulong _max;
+        KeyValuePair<float, Brush>[] _range;
+        Lazy<PerformanceCounter>[] _factories;
     }
 }

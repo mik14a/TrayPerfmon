@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.6.33723.286
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11709.299 stable
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TrayPerfmon", "TrayPerfmon\TrayPerfmon.csproj", "{B009DB92-6AB4-4AA4-831E-585E9E73E31C}"
 EndProject
@@ -25,6 +25,8 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "TrayPerfmon.Installer", "Tr
 		{5C373DA9-B418-4B31-B5ED-4702204BD293} = {5C373DA9-B418-4B31-B5ED-4702204BD293}
 		{124D2514-3759-4F5E-BFB3-01AE6EBA7758} = {124D2514-3759-4F5E-BFB3-01AE6EBA7758}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrayPerfmon.Plugin.GpuMemory", "Plugins\TrayPerfmon.Plugin.GpuMemory\TrayPerfmon.Plugin.GpuMemory.csproj", "{3F2B122E-456F-4ACB-9407-F1521CDF7728}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,6 +60,10 @@ Global
 		{3294CEF0-9D51-4B50-9302-2B808B745318}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F3B48ECB-C88A-4872-A7C4-714749608E14}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{F3B48ECB-C88A-4872-A7C4-714749608E14}.Release|Any CPU.ActiveCfg = Release|x64
+		{3F2B122E-456F-4ACB-9407-F1521CDF7728}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F2B122E-456F-4ACB-9407-F1521CDF7728}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F2B122E-456F-4ACB-9407-F1521CDF7728}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F2B122E-456F-4ACB-9407-F1521CDF7728}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,6 +73,7 @@ Global
 		{5C373DA9-B418-4B31-B5ED-4702204BD293} = {4DABDC3F-34F9-40E0-8E90-4B7CB5E73DBF}
 		{124D2514-3759-4F5E-BFB3-01AE6EBA7758} = {4DABDC3F-34F9-40E0-8E90-4B7CB5E73DBF}
 		{3294CEF0-9D51-4B50-9302-2B808B745318} = {4DABDC3F-34F9-40E0-8E90-4B7CB5E73DBF}
+		{3F2B122E-456F-4ACB-9407-F1521CDF7728} = {4DABDC3F-34F9-40E0-8E90-4B7CB5E73DBF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BC296176-91C7-46A0-B1A1-D239DC45CC80}

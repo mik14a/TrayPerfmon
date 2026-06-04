@@ -18,7 +18,19 @@ namespace TrayPerfmon.Plugin.SampleCs
         /// <summary>
         /// Construct with 2 counter and sample 15 frame par second.
         /// </summary>
-        public SamplePlugin() : base(2, 1000 / 15) { }
+        public SamplePlugin() : base(2, false, 1000 / 15) {
+        }
+
+        /// <summary>
+        /// Apply settings.
+        /// </summary>
+        protected override void ApplySettings() {
+            _factories = [
+                new Lazy<PerformanceCounter>(() => new PerformanceCounter("PhysicalDisk", "% Disk Read Time", "_Total", true)),
+                new Lazy<PerformanceCounter>(() => new PerformanceCounter("PhysicalDisk", "% Disk Write Time", "_Total", true)),
+            ];
+            _brushes = new Brush[] { Brushes.Cyan, Brushes.Magenta };
+        }
 
         /// <summary>
         /// Override clear method.
@@ -51,23 +63,10 @@ namespace TrayPerfmon.Plugin.SampleCs
             }
         }
 
-        /// <summary>
-        /// Construct a class.
-        /// </summary>
-        static SamplePlugin() {
-            // Open 'Server Explorer' window and find your own performance counter in local machine
-            _factories = new Lazy<PerformanceCounter>[] {
-                new(() => new PerformanceCounter("PhysicalDisk", "% Disk Read Time", "_Total", true)),
-                new(() => new PerformanceCounter("PhysicalDisk", "% Disk Write Time", "_Total", true)),
-            };
-            // Create Read/Write color brush
-            _brushes = new Brush[] { Brushes.Cyan, Brushes.Magenta };
-        }
-
-        /// <summary>Static performance counter factories.</summary>
-        static readonly Lazy<PerformanceCounter>[] _factories;
+        /// <summary>Performance counter factories (rebuilt in ApplySettings).</summary>
+        Lazy<PerformanceCounter>[] _factories;
 
         /// <summary>Draw brush for disk access.</summary>
-        static readonly Brush[] _brushes;
+        Brush[] _brushes;
     }
 }

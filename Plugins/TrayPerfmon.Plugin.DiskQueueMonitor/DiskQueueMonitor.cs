@@ -9,14 +9,19 @@ using System.Linq;
 namespace TrayPerfmon.Plugin.DiskQueueMonitor
 {
     [Plugin("DiskQueueMonitor", "Disk queue monitor")]
-    public class DiskQueueMonitor : NotifyIconPlugin
+    public partial class DiskQueueMonitor : NotifyIconPlugin
     {
+        /// <summary>
+        /// The PerformanceCounter instance name for the PhysicalDisk category (e.g. "_Total" or "0 C:").
+        /// </summary>
+        public string DiskInstance { get; set; } = "_Total";
+
         protected override Lazy<PerformanceCounter>[] Factories => _factories;
 
         protected override string BalloonTipText {
             get {
                 var average = _queue.Select(q => q.Average()).ToArray();
-                return $"Avg. Disk Queue Length Read [{average[0]}]/ Write [{average[1]}]";
+                return $"[{DiskInstance}] Disk Queue Read / Write: {average[0]:0.00} / {average[1]:0.00}";
             }
         }
 
@@ -24,7 +29,7 @@ namespace TrayPerfmon.Plugin.DiskQueueMonitor
         const int Samples = FramesPerSecond * 2;
 
         DiskQueueMonitor()
-            : base(2, 1000 / FramesPerSecond) {
+            : base(2, true, 1000 / FramesPerSecond) {
             _queue = new Queue<float>[2];
             for (var rw = 0; rw < 2; ++rw) {
                 _queue[rw] = new Queue<float>();
@@ -32,6 +37,13 @@ namespace TrayPerfmon.Plugin.DiskQueueMonitor
                     _queue[rw].Enqueue(0f);
                 }
             }
+        }
+
+        protected override void ApplySettings() {
+            _factories = [
+                new Lazy<PerformanceCounter>(() => new PerformanceCounter("PhysicalDisk", "Avg. Disk Read Queue Length", DiskInstance ?? "_Total", true)),
+                new Lazy<PerformanceCounter>(() => new PerformanceCounter("PhysicalDisk", "Avg. Disk Write Queue Length", DiskInstance ?? "_Total", true)),
+            ];
         }
 
         protected override void Clear(Graphics graphics) {
@@ -69,14 +81,6 @@ namespace TrayPerfmon.Plugin.DiskQueueMonitor
         }
 
         readonly Queue<float>[] _queue;
-
-        static DiskQueueMonitor() {
-            _factories = new Lazy<PerformanceCounter>[] {
-                new(() => new PerformanceCounter("PhysicalDisk", "Avg. Disk Read Queue Length", "_Total", true)),
-                new(() => new PerformanceCounter("PhysicalDisk", "Avg. Disk Write Queue Length", "_Total", true)),
-            };
-        }
-
-        static readonly Lazy<PerformanceCounter>[] _factories;
+        Lazy<PerformanceCounter>[] _factories;
     }
 }
