@@ -11,8 +11,6 @@ namespace TrayPerfmon.Plugin.CpuGraph
     [Plugin("CpuGraph", "Draw % processor time")]
     public class CpuGraph : NotifyIconPlugin
     {
-        protected override Lazy<PerformanceCounter>[] Factories => _factories;
-
         const int FramesPerSecond = 15;
         const int Samples = FramesPerSecond / 2;
 
@@ -23,7 +21,7 @@ namespace TrayPerfmon.Plugin.CpuGraph
         public string High { get; set; } = "Red";
 
         public CpuGraph()
-            : base(Environment.ProcessorCount, false, 1000 / FramesPerSecond) {
+            : base(1000 / FramesPerSecond) {
             var queue = Enumerable.Range(0, Environment.ProcessorCount).Select(_ => new Queue<float>());
             _value = new List<Queue<float>>(queue);
         }
@@ -31,13 +29,14 @@ namespace TrayPerfmon.Plugin.CpuGraph
         protected override void ApplySettings() {
             const string categoryName = "Processor";
             const string counterName = "% Processor Time";
-            _factories = Enumerable.Range(0, _count)
-                .Select(index => new Lazy<PerformanceCounter>(() => new PerformanceCounter(categoryName, counterName, index.ToString(), true)))
+            foreach (var counter in _performanceCounter) {
+                counter.Dispose();
+            }
+            _performanceCounter = Enumerable.Range(0, Environment.ProcessorCount)
+                .Select(index => new PerformanceCounter(categoryName, counterName, index.ToString(), true))
                 .ToArray();
-            if (_range != null) {
-                foreach (var range in _range) {
-                    range.Value.Dispose();
-                }
+            foreach (var range in _range) {
+                range.Value.Dispose();
             }
             var converter = new ColorConverter();
             _range = [
@@ -51,7 +50,8 @@ namespace TrayPerfmon.Plugin.CpuGraph
             graphics.Clear(Color.Black);
         }
 
-        protected override void Draw(Graphics graphics, float[] value) {
+        protected override void Draw(Graphics graphics) {
+            var value = _performanceCounter.Select(counter => counter.NextValue()).ToArray();
             for (var i = 0; i < value.Length; ++i) {
                 _value[i].Enqueue(value[i]);
                 while (_value[i].Count > Samples) _value[i].Dequeue();
@@ -70,6 +70,9 @@ namespace TrayPerfmon.Plugin.CpuGraph
 
         protected override void Dispose(bool disposing) {
             if (disposing) {
+                foreach (var counter in _performanceCounter) {
+                    counter.Dispose();
+                }
                 foreach (var range in _range) {
                     range.Value.Dispose();
                 }
@@ -77,8 +80,8 @@ namespace TrayPerfmon.Plugin.CpuGraph
             base.Dispose(disposing);
         }
 
+        PerformanceCounter[] _performanceCounter = [];
         readonly List<Queue<float>> _value;
-        KeyValuePair<int, Brush>[] _range;
-        Lazy<PerformanceCounter>[] _factories;
+        KeyValuePair<int, Brush>[] _range = [];
     }
 }

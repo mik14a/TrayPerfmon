@@ -14,8 +14,6 @@ namespace TrayPerfmon.Plugin.MemoryMeter
     [Plugin("MemoryMeter", "Display memory usage")]
     public class MemoryMeter : NotifyIconPlugin
     {
-        protected override Lazy<PerformanceCounter>[] Factories => _factories;
-
         protected override string BalloonTipText {
             get {
                 var committed = (Committed * 100).ToString("0.00");
@@ -37,20 +35,21 @@ namespace TrayPerfmon.Plugin.MemoryMeter
         protected float Use { get; private set; }
 
         public MemoryMeter()
-            : base(2, false, 1000 / FramesPerSecond) {
+            : base(1000 / FramesPerSecond) {
             _max = new ComputerInfo().TotalPhysicalMemory;
         }
 
         protected override void ApplySettings() {
             const string categoryName = "Memory";
-            _factories = [
-                new Lazy<PerformanceCounter>(() => new PerformanceCounter(categoryName, "% Committed Bytes In Use", true)),
-                new Lazy<PerformanceCounter>(() => new PerformanceCounter(categoryName, "Available Bytes", true))
+            foreach (var counter in _performanceCounter) {
+                counter.Dispose();
+            }
+            _performanceCounter = [
+                new PerformanceCounter(categoryName, "% Committed Bytes In Use", true),
+                new PerformanceCounter(categoryName, "Available Bytes", true)
             ];
-            if (_range != null) {
-                foreach (var range in _range) {
-                    range.Value.Dispose();
-                }
+            foreach (var range in _range) {
+                range.Value.Dispose();
             }
             var converter = new ColorConverter();
             _range = [
@@ -64,8 +63,9 @@ namespace TrayPerfmon.Plugin.MemoryMeter
             graphics.Clear(Color.Transparent);
         }
 
-        protected override void Draw(Graphics graphics, float[] value) {
-            _available = (ulong)value[1];
+        protected override void Draw(Graphics graphics) {
+            var value = _performanceCounter.Select(counter => counter.NextValue()).ToArray();
+            _available = (ulong)value[1];  // Available Bytes
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
             Committed = value[0] / 100f;
             Use = 1f - (float)_available / _max;
@@ -81,7 +81,10 @@ namespace TrayPerfmon.Plugin.MemoryMeter
         }
 
         protected override void Dispose(bool disposing) {
-            if (disposing && _range != null) {
+            if (disposing) {
+                foreach (var counter in _performanceCounter) {
+                    counter.Dispose();
+                }
                 foreach (var range in _range) {
                     range.Value.Dispose();
                 }
@@ -89,9 +92,9 @@ namespace TrayPerfmon.Plugin.MemoryMeter
             base.Dispose(disposing);
         }
 
+        PerformanceCounter[] _performanceCounter = [];
         ulong _available;
         readonly ulong _max;
-        KeyValuePair<float, Brush>[] _range;
-        Lazy<PerformanceCounter>[] _factories;
+        KeyValuePair<float, Brush>[] _range = [];
     }
 }

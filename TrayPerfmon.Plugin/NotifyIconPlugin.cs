@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel.Plugin;
-using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -9,20 +8,15 @@ namespace TrayPerfmon.Plugin
 {
     public abstract partial class NotifyIconPlugin : IPlugin, IDisposable
     {
-        protected abstract Lazy<PerformanceCounter>[] Factories { get; }
-
         protected virtual string BalloonTipText { get; } = string.Empty;
 
+        protected virtual bool HasSettings { get; } = false;
         protected virtual void ShowSettings() { }
         protected virtual void ApplySettings() { }
         protected abstract void Clear(Graphics graphics);
-        protected abstract void Draw(Graphics graphics, float[] value);
+        protected abstract void Draw(Graphics graphics);
 
-        public NotifyIconPlugin(int count, bool hasSettings, int interval) {
-            _count = count;
-            _hasSettings = hasSettings;
-            _performanceCounter = new PerformanceCounter[_count];
-            _value = new float[_count];
+        public NotifyIconPlugin(int interval) {
             _timer.Interval = interval;
             _timer.Tick += Tick;
         }
@@ -37,12 +31,6 @@ namespace TrayPerfmon.Plugin
 
         public void Apply() {
             ApplySettings();
-            for (var i = 0; i < _count; ++i) {
-                _performanceCounter[i]?.Dispose();
-            }
-            for (var i = 0; i < _count; ++i) {
-                _performanceCounter[i] = Factories[i]?.Value;
-            }
         }
 
         public void Dispose() {
@@ -51,12 +39,9 @@ namespace TrayPerfmon.Plugin
         }
 
         void Tick(object sender, EventArgs e) {
-            for (var i = 0; i < _count; ++i) {
-                _value[i] = _performanceCounter[i].NextValue();
-            }
             using (var graphics = Graphics.FromImage(_image)) {
                 Clear(graphics);
-                Draw(graphics, _value);
+                Draw(graphics);
             }
             var handle = _image.GetHicon();
             try {
@@ -71,7 +56,7 @@ namespace TrayPerfmon.Plugin
 
         void NotifyIconMouseClick(object sender, MouseEventArgs e) {
             if (e.Button == MouseButtons.Left) {
-                if (_hasSettings) {
+                if (HasSettings) {
                     ShowSettings();
                 }
             } else if (e.Button == MouseButtons.Right) {
@@ -87,9 +72,6 @@ namespace TrayPerfmon.Plugin
                     _notifyIcon?.Dispose();
                     _timer?.Dispose();
                     _image?.Dispose();
-                    foreach (var performanceCounter in _performanceCounter) {
-                        performanceCounter?.Dispose();
-                    }
                 }
                 _disposed = true;
             }
@@ -98,11 +80,6 @@ namespace TrayPerfmon.Plugin
         readonly NotifyIcon _notifyIcon = new();
         readonly Timer _timer = new();
         readonly Bitmap _image = new(16, 16);
-        readonly PerformanceCounter[] _performanceCounter;
-        readonly float[] _value;
-
-        protected readonly int _count;
-        protected readonly bool _hasSettings;
 
         bool _disposed = false;
 

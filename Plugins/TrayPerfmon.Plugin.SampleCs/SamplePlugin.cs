@@ -3,6 +3,7 @@ using System.ComponentModel.Plugin;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 
 namespace TrayPerfmon.Plugin.SampleCs
 {
@@ -11,23 +12,21 @@ namespace TrayPerfmon.Plugin.SampleCs
     public class SamplePlugin : NotifyIconPlugin
     {
         /// <summary>
-        /// Override factories for create performance counter.
+        /// Construct sample 15 frame par second.
         /// </summary>
-        protected override Lazy<PerformanceCounter>[] Factories => _factories;
-
-        /// <summary>
-        /// Construct with 2 counter and sample 15 frame par second.
-        /// </summary>
-        public SamplePlugin() : base(2, false, 1000 / 15) {
+        public SamplePlugin() : base(1000 / 15) {
         }
 
         /// <summary>
         /// Apply settings.
         /// </summary>
         protected override void ApplySettings() {
-            _factories = [
-                new Lazy<PerformanceCounter>(() => new PerformanceCounter("PhysicalDisk", "% Disk Read Time", "_Total", true)),
-                new Lazy<PerformanceCounter>(() => new PerformanceCounter("PhysicalDisk", "% Disk Write Time", "_Total", true)),
+            foreach (var counter in _performanceCounter) {
+                counter.Dispose();
+            }
+            _performanceCounter = [
+                new PerformanceCounter("PhysicalDisk", "% Disk Read Time", "_Total", true),
+                new PerformanceCounter("PhysicalDisk", "% Disk Write Time", "_Total", true),
             ];
             _brushes = new Brush[] { Brushes.Cyan, Brushes.Magenta };
         }
@@ -44,7 +43,8 @@ namespace TrayPerfmon.Plugin.SampleCs
         /// <summary>
         /// Override draw method.
         /// </summary>
-        protected override void Draw(Graphics graphics, float[] value) {
+        protected override void Draw(Graphics graphics) {
+            var value = _performanceCounter.Select(counter => counter.NextValue()).ToArray();
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
             var bounds = graphics.VisibleClipBounds;
             // Draw Read/Write % value
@@ -63,8 +63,16 @@ namespace TrayPerfmon.Plugin.SampleCs
             }
         }
 
-        /// <summary>Performance counter factories (rebuilt in ApplySettings).</summary>
-        Lazy<PerformanceCounter>[] _factories;
+        protected override void Dispose(bool disposing) {
+            if (disposing) {
+                foreach (var counter in _performanceCounter) {
+                    counter.Dispose();
+                }
+            }
+            base.Dispose(disposing);
+        }
+
+        PerformanceCounter[] _performanceCounter = [];
 
         /// <summary>Draw brush for disk access.</summary>
         Brush[] _brushes;

@@ -12,8 +12,6 @@ namespace TrayPerfmon.Plugin.GpuMemory
     [Plugin("GpuMemory", "GPU adapter memory (VRAM) usage - works for AMD, NVIDIA, Intel etc.")]
     public partial class GpuMemory : NotifyIconPlugin
     {
-        protected override Lazy<PerformanceCounter>[] Factories => _factories;
-
         protected override string BalloonTipText {
             get {
                 var used = _value;
@@ -33,8 +31,10 @@ namespace TrayPerfmon.Plugin.GpuMemory
         public string Middle { get; set; } = "Yellow";
         public string High { get; set; } = "Red";
 
+        protected override bool HasSettings => true;
+
         public GpuMemory()
-            : base(1, true, 1000 / FramesPerSecond) {
+            : base(1000 / FramesPerSecond) {
             _history = new Queue<float>();
             for (var i = 0; i < Samples; ++i) {
                 _history.Enqueue(0f);
@@ -43,19 +43,16 @@ namespace TrayPerfmon.Plugin.GpuMemory
 
         protected override void ApplySettings() {
             var adapters = GpuInfo.GetGpuAdapters();
-            if (InstanceName == null) {
-                _gpu = adapters.First();
-            } else {
-                _gpu = adapters.FirstOrDefault(g => g.InstanceName == InstanceName) ?? adapters.First();
-            }
+            _gpu = InstanceName == null ? adapters.First() : adapters.FirstOrDefault(g => g.InstanceName == InstanceName) ?? adapters.First();
             InstanceName = _gpu.InstanceName;
-            _factories = [
-                new Lazy<PerformanceCounter>(() => new PerformanceCounter("GPU Adapter Memory", "Dedicated Usage", _gpu.InstanceName, true))
+            foreach (var counter in _performanceCounter) {
+                counter.Dispose();
+            }
+            _performanceCounter = [
+                new PerformanceCounter("GPU Adapter Memory", "Dedicated Usage", _gpu.InstanceName, true)
             ];
-            if (_range != null) {
-                foreach (var range in _range) {
-                    range.Value.Dispose();
-                }
+            foreach (var range in _range) {
+                range.Value.Dispose();
             }
             var converter = new ColorConverter();
             _range = [
@@ -69,7 +66,8 @@ namespace TrayPerfmon.Plugin.GpuMemory
             graphics.Clear(Color.Black);
         }
 
-        protected override void Draw(Graphics graphics, float[] value) {
+        protected override void Draw(Graphics graphics) {
+            var value = _performanceCounter.Select(counter => counter.NextValue()).ToArray();
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
             _value = value[0];
             var percent = Math.Clamp(_value * 100f / _gpu.VideoMemory, 0f, 100f);
@@ -88,7 +86,10 @@ namespace TrayPerfmon.Plugin.GpuMemory
         }
 
         protected override void Dispose(bool disposing) {
-            if (disposing && _range != null) {
+            if (disposing) {
+                foreach (var counter in _performanceCounter) {
+                    counter.Dispose();
+                }
                 foreach (var range in _range) {
                     range.Value.Dispose();
                 }
@@ -96,10 +97,10 @@ namespace TrayPerfmon.Plugin.GpuMemory
             base.Dispose(disposing);
         }
 
+        PerformanceCounter[] _performanceCounter = [];
         GpuInfo _gpu;
         float _value;
-        Queue<float> _history;
-        KeyValuePair<int, Brush>[] _range;
-        Lazy<PerformanceCounter>[] _factories;
+        readonly Queue<float> _history;
+        KeyValuePair<int, Brush>[] _range = [];
     }
 }

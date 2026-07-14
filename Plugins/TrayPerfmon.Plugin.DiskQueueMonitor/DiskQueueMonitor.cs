@@ -16,8 +16,6 @@ namespace TrayPerfmon.Plugin.DiskQueueMonitor
         /// </summary>
         public string DiskInstance { get; set; } = "_Total";
 
-        protected override Lazy<PerformanceCounter>[] Factories => _factories;
-
         protected override string BalloonTipText {
             get {
                 var average = _queue.Select(q => q.Average()).ToArray();
@@ -28,8 +26,10 @@ namespace TrayPerfmon.Plugin.DiskQueueMonitor
         const int FramesPerSecond = 15;
         const int Samples = FramesPerSecond * 2;
 
+        protected override bool HasSettings => true;
+
         DiskQueueMonitor()
-            : base(2, true, 1000 / FramesPerSecond) {
+            : base(1000 / FramesPerSecond) {
             _queue = new Queue<float>[2];
             for (var rw = 0; rw < 2; ++rw) {
                 _queue[rw] = new Queue<float>();
@@ -40,9 +40,13 @@ namespace TrayPerfmon.Plugin.DiskQueueMonitor
         }
 
         protected override void ApplySettings() {
-            _factories = [
-                new Lazy<PerformanceCounter>(() => new PerformanceCounter("PhysicalDisk", "Avg. Disk Read Queue Length", DiskInstance ?? "_Total", true)),
-                new Lazy<PerformanceCounter>(() => new PerformanceCounter("PhysicalDisk", "Avg. Disk Write Queue Length", DiskInstance ?? "_Total", true)),
+            foreach (var counter in _performanceCounter) {
+                counter.Dispose();
+            }
+            var instance = DiskInstance ?? "_Total";
+            _performanceCounter = [
+                new PerformanceCounter("PhysicalDisk", "Avg. Disk Read Queue Length", instance, true),
+                new PerformanceCounter("PhysicalDisk", "Avg. Disk Write Queue Length", instance, true),
             ];
         }
 
@@ -50,7 +54,8 @@ namespace TrayPerfmon.Plugin.DiskQueueMonitor
             graphics.Clear(Color.Black);
         }
 
-        protected override void Draw(Graphics graphics, float[] value) {
+        protected override void Draw(Graphics graphics) {
+            var value = _performanceCounter.Select(counter => counter.NextValue()).ToArray();
             for (var rw = 0; rw < 2; ++rw) {
                 _queue[rw].Enqueue(value[rw]);
                 while (Samples < _queue[rw].Count) {
@@ -80,7 +85,16 @@ namespace TrayPerfmon.Plugin.DiskQueueMonitor
             }
         }
 
+        protected override void Dispose(bool disposing) {
+            if (disposing) {
+                foreach (var counter in _performanceCounter) {
+                    counter.Dispose();
+                }
+            }
+            base.Dispose(disposing);
+        }
+
+        PerformanceCounter[] _performanceCounter = [];
         readonly Queue<float>[] _queue;
-        Lazy<PerformanceCounter>[] _factories;
     }
 }
