@@ -24,21 +24,18 @@ namespace TrayPerfmon.Plugin.GpuMemory
         }
 
         const int FramesPerSecond = 15;
-        const int Samples = 16;
 
         public string InstanceName { get; set; }
-        public string Low { get; set; } = "Lime";
-        public string Middle { get; set; } = "Yellow";
-        public string High { get; set; } = "Red";
+        // Dark-editor palette (Dracula accents — higher contrast than One Dark).
+        public string Low { get; set; } = "#50fa7b";
+        public string Middle { get; set; } = "#f1fa8c";
+        public string High { get; set; } = "#ff5555";
 
         protected override bool HasSettings => true;
 
         public GpuMemory()
             : base(1000 / FramesPerSecond) {
             _history = new Queue<float>();
-            for (var i = 0; i < Samples; ++i) {
-                _history.Enqueue(0f);
-            }
         }
 
         protected override void ApplySettings() {
@@ -63,22 +60,24 @@ namespace TrayPerfmon.Plugin.GpuMemory
         }
 
         protected override void Clear(Graphics graphics) {
-            graphics.Clear(Color.Black);
+            // Same family as GpuUsage sparkline.
+            graphics.Clear(Color.FromArgb(0x08, 0x00, 0x00, 0x00));
         }
 
         protected override void Draw(Graphics graphics) {
             var value = _performanceCounter.Select(counter => counter.NextValue()).ToArray();
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            var size = IconSize;
             _value = value[0];
             var percent = Math.Clamp(_value * 100f / _gpu.VideoMemory, 0f, 100f);
             _history.Enqueue(percent);
-            while (Samples < _history.Count) {
+            while (size < _history.Count) {
                 _history.Dequeue();
             }
             var x = 0;
             foreach (var framePercent in _history) {
-                var height = 16f * framePercent / 100f;
-                var y = 16f - height;
+                var height = size * framePercent / 100f;
+                var y = size - height;
                 var brush = _range.First(range => framePercent <= range.Key).Value;
                 graphics.FillRectangle(brush, x, y, 1, height);
                 ++x;

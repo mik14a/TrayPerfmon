@@ -31,12 +31,7 @@ namespace TrayPerfmon.Plugin.SampleCs
             _brushes = new Brush[] { Brushes.Cyan, Brushes.Magenta };
         }
 
-        /// <summary>
-        /// Override clear method.
-        /// </summary>
-        /// <param name="graphics"></param>
         protected override void Clear(Graphics graphics) {
-            //Clear icon image
             graphics.Clear(Color.Transparent);
         }
 
@@ -55,7 +50,7 @@ namespace TrayPerfmon.Plugin.SampleCs
             for (var rw = 0; rw < 2; ++rw) {
                 var next = (int)(value[rw] + sample - .1f) / sample;
                 for (var i = 0; i < count; ++i) {
-                    var brush = i < next ? _brushes[rw] : Brushes.Black;
+                    var brush = i < next ? _brushes[rw] : new SolidBrush(Color.FromArgb(0xC0, 0x00, 0x00, 0x00));
                     var dx = i % column;
                     var dy = i / column;
                     graphics.FillRectangle(brush, x + width * dx, y * rw + height * dy, width, height);

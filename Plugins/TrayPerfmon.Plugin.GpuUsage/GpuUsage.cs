@@ -20,23 +20,20 @@ namespace TrayPerfmon.Plugin.GpuUsage
         protected override string BalloonTipText => $"{_gpuName} [{EngineType}]: {_percent:0.0}%";
 
         const int FramesPerSecond = 15;
-        const int Samples = 16;
         const int RefreshInstanceMs = 1000;
         const float EmaAlpha = 0.3f; // EMA weight on the new sample (higher = snappier).
         const string EngTypeMarker = "_engtype_";
 
-        public string Low { get; set; } = "Lime";
-        public string Middle { get; set; } = "Yellow";
-        public string High { get; set; } = "Red";
+        // Dark-editor palette (Dracula accents — higher contrast than One Dark).
+        public string Low { get; set; } = "#50fa7b";
+        public string Middle { get; set; } = "#f1fa8c";
+        public string High { get; set; } = "#ff5555";
 
         protected override bool HasSettings => true;
 
         public GpuUsage()
             : base(1000 / FramesPerSecond) {
             _history = new Queue<float>();
-            for (var i = 0; i < Samples; ++i) {
-                _history.Enqueue(0f);
-            }
         }
 
         protected override void ApplySettings() {
@@ -76,7 +73,8 @@ namespace TrayPerfmon.Plugin.GpuUsage
         }
 
         protected override void Clear(Graphics graphics) {
-            graphics.Clear(Color.Black);
+            // 1px sparkline; slightly stronger plate than CpuGraph so thin bars stay readable.
+            graphics.Clear(Color.FromArgb(0x08, 0x00, 0x00, 0x00));
         }
 
         protected override void Draw(Graphics graphics) {
@@ -98,16 +96,17 @@ namespace TrayPerfmon.Plugin.GpuUsage
             }
 
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            var size = IconSize;
             var sample = Math.Clamp(sum, 0f, 100f);
             _percent = EmaAlpha * sample + (1f - EmaAlpha) * _percent;
             _history.Enqueue(_percent);
-            while (Samples < _history.Count) {
+            while (size < _history.Count) {
                 _history.Dequeue();
             }
             var x = 0;
             foreach (var framePercent in _history) {
-                var height = 16f * framePercent / 100f;
-                var y = 16f - height;
+                var height = size * framePercent / 100f;
+                var y = size - height;
                 var brush = _range.First(range => framePercent <= range.Key).Value;
                 graphics.FillRectangle(brush, x, y, 1, height);
                 ++x;

@@ -4,7 +4,7 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
-    <ApplicationHighDpiMode>DpiUnawareGdiScaled</ApplicationHighDpiMode>
+    <ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
     <OutputPath>$(SolutionDir)bin\$(Configuration)</OutputPath>
     <FileVersion>0.1.0.0</FileVersion>
     <Version>0.1.0</Version>

@@ -14,11 +14,12 @@ namespace TrayPerfmon.Plugin.CpuGraph
         const int FramesPerSecond = 15;
         const int Samples = FramesPerSecond / 2;
 
-        public string Low { get; set; } = "Lime";
+        // Dark-editor palette (Dracula accents — higher contrast than One Dark).
+        public string Low { get; set; } = "#50fa7b";
 
-        public string Middle { get; set; } = "Yellow";
+        public string Middle { get; set; } = "#f1fa8c";
 
-        public string High { get; set; } = "Red";
+        public string High { get; set; } = "#ff5555";
 
         public CpuGraph()
             : base(1000 / FramesPerSecond) {
@@ -47,7 +48,8 @@ namespace TrayPerfmon.Plugin.CpuGraph
         }
 
         protected override void Clear(Graphics graphics) {
-            graphics.Clear(Color.Black);
+            // Per-plugin backdrop alpha (bar chart needs a plate; tune here only).
+            graphics.Clear(Color.FromArgb(0x08, 0x00, 0x00, 0x00));
         }
 
         protected override void Draw(Graphics graphics) {
@@ -57,12 +59,13 @@ namespace TrayPerfmon.Plugin.CpuGraph
                 while (_value[i].Count > Samples) _value[i].Dequeue();
             }
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            var width = 16f / _value.Count;
+            var size = IconSize;
+            var width = (float)size / _value.Count;
             for (var i = 0; i < _value.Count; ++i) {
-                var x = 16f * i / _value.Count;
+                var x = (float)size * i / _value.Count;
                 var average = _value[i].Average();
-                var height = 16f * average / 100f;
-                var y = 16f - height;
+                var height = size * average / 100f;
+                var y = size - height;
                 var brush = _range.First(range => average <= range.Key).Value;
                 graphics.FillRectangle(brush, x, y, width, height);
             }

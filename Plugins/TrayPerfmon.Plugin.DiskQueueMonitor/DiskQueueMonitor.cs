@@ -51,7 +51,8 @@ namespace TrayPerfmon.Plugin.DiskQueueMonitor
         }
 
         protected override void Clear(Graphics graphics) {
-            graphics.Clear(Color.Black);
+            // Waveform on dark plate; alpha local to this plugin.
+            graphics.Clear(Color.FromArgb(0x08, 0x00, 0x00, 0x00));
         }
 
         protected override void Draw(Graphics graphics) {
@@ -79,7 +80,7 @@ namespace TrayPerfmon.Plugin.DiskQueueMonitor
                     graphics.DrawLine(Pens.Gray, start, one, start + count, one);
                 }
 
-                var pen = 3f < average ? Pens.Red : 1f < average ? Pens.Yellow : Pens.Lime;
+                var pen = 3f < average ? _penHigh : 1f < average ? _penMiddle : _penLow;
                 var points = Enumerable.Range(start, count).Reverse().Zip(disp, (x, y) => new PointF(x, center + y * delta)).ToArray();
                 graphics.DrawLines(pen, points);
             }
@@ -90,11 +91,18 @@ namespace TrayPerfmon.Plugin.DiskQueueMonitor
                 foreach (var counter in _performanceCounter) {
                     counter.Dispose();
                 }
+                _penLow.Dispose();
+                _penMiddle.Dispose();
+                _penHigh.Dispose();
             }
             base.Dispose(disposing);
         }
 
         PerformanceCounter[] _performanceCounter = [];
         readonly Queue<float>[] _queue;
+        // Dark-editor palette (Dracula accents — higher contrast than One Dark).
+        readonly Pen _penLow = new(ColorTranslator.FromHtml("#50fa7b"));
+        readonly Pen _penMiddle = new(ColorTranslator.FromHtml("#f1fa8c"));
+        readonly Pen _penHigh = new(ColorTranslator.FromHtml("#ff5555"));
     }
 }
