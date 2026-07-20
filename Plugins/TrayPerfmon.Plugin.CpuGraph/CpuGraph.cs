@@ -11,20 +11,22 @@ namespace TrayPerfmon.Plugin.CpuGraph
     [Plugin("CpuGraph", "Draw % processor time")]
     public class CpuGraph : NotifyIconPlugin
     {
-        const int FramesPerSecond = 15;
-        const int Samples = FramesPerSecond / 2;
-
         // Dark-editor palette (Dracula accents — higher contrast than One Dark).
         public string Low { get; set; } = "#50fa7b";
-
         public string Middle { get; set; } = "#f1fa8c";
-
         public string High { get; set; } = "#ff5555";
+        public string Fill { get; set; } = "#08000000";
+
+        protected override string BalloonTipText => $"CPU Usage: {Value:0.0}%";
+        protected float Value { get; private set; }
+
+        const int FramesPerSecond = 15;
+        const int Samples = FramesPerSecond / 2;
 
         public CpuGraph()
             : base(1000 / FramesPerSecond) {
             var queue = Enumerable.Range(0, Environment.ProcessorCount).Select(_ => new Queue<float>());
-            _value = new List<Queue<float>>(queue);
+            _value = [.. queue];
         }
 
         protected override void ApplySettings() {
@@ -45,11 +47,11 @@ namespace TrayPerfmon.Plugin.CpuGraph
                 new(75, new SolidBrush((Color)converter.ConvertFrom(Middle))),
                 new(100, new SolidBrush((Color)converter.ConvertFrom(High)))
             ];
+            _fill = (Color)converter.ConvertFrom(Fill);
         }
 
         protected override void Clear(Graphics graphics) {
-            // Per-plugin backdrop alpha (bar chart needs a plate; tune here only).
-            graphics.Clear(Color.FromArgb(0x08, 0x00, 0x00, 0x00));
+            graphics.Clear(_fill);
         }
 
         protected override void Draw(Graphics graphics) {
@@ -58,6 +60,7 @@ namespace TrayPerfmon.Plugin.CpuGraph
                 _value[i].Enqueue(value[i]);
                 while (_value[i].Count > Samples) _value[i].Dequeue();
             }
+            Value = _value.Select(queue => queue.Average()).Average();
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
             var size = IconSize;
             var width = (float)size / _value.Count;
@@ -83,8 +86,10 @@ namespace TrayPerfmon.Plugin.CpuGraph
             base.Dispose(disposing);
         }
 
-        PerformanceCounter[] _performanceCounter = [];
         readonly List<Queue<float>> _value;
+
+        PerformanceCounter[] _performanceCounter = [];
         KeyValuePair<int, Brush>[] _range = [];
+        Color _fill;
     }
 }

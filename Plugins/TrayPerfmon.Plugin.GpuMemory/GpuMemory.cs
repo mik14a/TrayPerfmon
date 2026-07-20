@@ -12,26 +12,27 @@ namespace TrayPerfmon.Plugin.GpuMemory
     [Plugin("GpuMemory", "GPU adapter memory (VRAM) usage - works for AMD, NVIDIA, Intel etc.")]
     public partial class GpuMemory : NotifyIconPlugin
     {
-        protected override string BalloonTipText {
-            get {
-                var used = _value;
-                var total = _gpu.VideoMemory;
-                var percent = total > 0 ? (used * 100.0 / total) : 0;
-                var usedText = ((long)used).ToString(Multiple.Binary);
-                var totalText = ((long)total).ToString(Multiple.Binary);
-                return $"{_gpu.Name}: {percent:0.0}% ({usedText} / {totalText})";
-            }
-        }
-
-        const int FramesPerSecond = 15;
-
+        /// <summary>The PerformanceCounter instance name for the GPU Adapter Memory category (e.g. "luid_0x..._phys_0").</summary>
         public string InstanceName { get; set; }
         // Dark-editor palette (Dracula accents — higher contrast than One Dark).
         public string Low { get; set; } = "#50fa7b";
         public string Middle { get; set; } = "#f1fa8c";
         public string High { get; set; } = "#ff5555";
+        public string Fill { get; set; } = "#08000000";
 
+        protected override string BalloonTipText {
+            get {
+                var total = _gpu.VideoMemory;
+                var percent = total > 0 ? (Value * 100f / total) : 0f;
+                var usedText = ((long)Value).ToString(Multiple.Binary);
+                var totalText = ((long)total).ToString(Multiple.Binary);
+                return $"{_gpu.Name}: {percent:0.0}% ({usedText} / {totalText})";
+            }
+        }
+        protected float Value { get; private set; }
         protected override bool HasSettings => true;
+
+        const int FramesPerSecond = 15;
 
         public GpuMemory()
             : base(1000 / FramesPerSecond) {
@@ -57,19 +58,19 @@ namespace TrayPerfmon.Plugin.GpuMemory
                 new(75, new SolidBrush((Color)converter.ConvertFrom(Middle))),
                 new(100, new SolidBrush((Color)converter.ConvertFrom(High)))
             ];
+            _fill = (Color)converter.ConvertFrom(Fill);
         }
 
         protected override void Clear(Graphics graphics) {
-            // Same family as GpuUsage sparkline.
-            graphics.Clear(Color.FromArgb(0x08, 0x00, 0x00, 0x00));
+            graphics.Clear(_fill);
         }
 
         protected override void Draw(Graphics graphics) {
             var value = _performanceCounter.Select(counter => counter.NextValue()).ToArray();
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
             var size = IconSize;
-            _value = value[0];
-            var percent = Math.Clamp(_value * 100f / _gpu.VideoMemory, 0f, 100f);
+            Value = value[0];
+            var percent = Math.Clamp(Value * 100f / _gpu.VideoMemory, 0f, 100f);
             _history.Enqueue(percent);
             while (size < _history.Count) {
                 _history.Dequeue();
@@ -96,10 +97,11 @@ namespace TrayPerfmon.Plugin.GpuMemory
             base.Dispose(disposing);
         }
 
-        PerformanceCounter[] _performanceCounter = [];
-        GpuInfo _gpu;
-        float _value;
         readonly Queue<float> _history;
+
+        GpuInfo _gpu;
+        PerformanceCounter[] _performanceCounter = [];
         KeyValuePair<int, Brush>[] _range = [];
+        Color _fill;
     }
 }

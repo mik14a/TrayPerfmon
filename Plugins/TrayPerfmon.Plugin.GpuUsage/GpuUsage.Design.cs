@@ -104,8 +104,7 @@ namespace TrayPerfmon.Plugin.GpuUsage
             var luid = instance.IndexOf("luid_", System.StringComparison.Ordinal);
             if (luid < 0) return string.Empty;
             var eng = instance.IndexOf("_eng_", luid, System.StringComparison.Ordinal);
-            if (eng < 0) return string.Empty;
-            return instance[luid..eng];
+            return eng < 0 ? string.Empty : instance[luid..eng];
         }
     }
 }

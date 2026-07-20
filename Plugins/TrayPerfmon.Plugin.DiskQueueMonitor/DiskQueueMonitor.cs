@@ -11,10 +11,13 @@ namespace TrayPerfmon.Plugin.DiskQueueMonitor
     [Plugin("DiskQueueMonitor", "Disk queue monitor")]
     public partial class DiskQueueMonitor : NotifyIconPlugin
     {
-        /// <summary>
-        /// The PerformanceCounter instance name for the PhysicalDisk category (e.g. "_Total" or "0 C:").
-        /// </summary>
+        /// <summary>The PerformanceCounter instance name for the PhysicalDisk category (e.g. "_Total" or "0 C:").</summary>
         public string DiskInstance { get; set; } = "_Total";
+        // Dark-editor palette (Dracula accents — higher contrast than One Dark).
+        public string Low { get; set; } = "#50fa7b";
+        public string Middle { get; set; } = "#f1fa8c";
+        public string High { get; set; } = "#ff5555";
+        public string Fill { get; set; } = "#08000000";
 
         protected override string BalloonTipText {
             get {
@@ -22,11 +25,10 @@ namespace TrayPerfmon.Plugin.DiskQueueMonitor
                 return $"[{DiskInstance}] Disk Queue Read / Write: {average[0]:0.00} / {average[1]:0.00}";
             }
         }
+        protected override bool HasSettings => true;
 
         const int FramesPerSecond = 15;
         const int Samples = FramesPerSecond * 2;
-
-        protected override bool HasSettings => true;
 
         DiskQueueMonitor()
             : base(1000 / FramesPerSecond) {
@@ -48,11 +50,20 @@ namespace TrayPerfmon.Plugin.DiskQueueMonitor
                 new PerformanceCounter("PhysicalDisk", "Avg. Disk Read Queue Length", instance, true),
                 new PerformanceCounter("PhysicalDisk", "Avg. Disk Write Queue Length", instance, true),
             ];
+            foreach (var range in _range) {
+                range.Value.Dispose();
+            }
+            var converter = new ColorConverter();
+            _range = [
+                new(0f, new Pen((Color)converter.ConvertFrom(Low))),
+                new(1f, new Pen((Color)converter.ConvertFrom(Middle))),
+                new(3f, new Pen((Color)converter.ConvertFrom(High)))
+            ];
+            _fill = (Color)converter.ConvertFrom(Fill);
         }
 
         protected override void Clear(Graphics graphics) {
-            // Waveform on dark plate; alpha local to this plugin.
-            graphics.Clear(Color.FromArgb(0x08, 0x00, 0x00, 0x00));
+            graphics.Clear(_fill);
         }
 
         protected override void Draw(Graphics graphics) {
@@ -80,7 +91,7 @@ namespace TrayPerfmon.Plugin.DiskQueueMonitor
                     graphics.DrawLine(Pens.Gray, start, one, start + count, one);
                 }
 
-                var pen = 3f < average ? _penHigh : 1f < average ? _penMiddle : _penLow;
+                var pen = _range.Last(range => range.Key <= average).Value;
                 var points = Enumerable.Range(start, count).Reverse().Zip(disp, (x, y) => new PointF(x, center + y * delta)).ToArray();
                 graphics.DrawLines(pen, points);
             }
@@ -91,18 +102,17 @@ namespace TrayPerfmon.Plugin.DiskQueueMonitor
                 foreach (var counter in _performanceCounter) {
                     counter.Dispose();
                 }
-                _penLow.Dispose();
-                _penMiddle.Dispose();
-                _penHigh.Dispose();
+                foreach (var range in _range) {
+                    range.Value.Dispose();
+                }
             }
             base.Dispose(disposing);
         }
 
-        PerformanceCounter[] _performanceCounter = [];
         readonly Queue<float>[] _queue;
-        // Dark-editor palette (Dracula accents — higher contrast than One Dark).
-        readonly Pen _penLow = new(ColorTranslator.FromHtml("#50fa7b"));
-        readonly Pen _penMiddle = new(ColorTranslator.FromHtml("#f1fa8c"));
-        readonly Pen _penHigh = new(ColorTranslator.FromHtml("#ff5555"));
+
+        PerformanceCounter[] _performanceCounter = [];
+        KeyValuePair<float, Pen>[] _range = [];
+        Color _fill;
     }
 }

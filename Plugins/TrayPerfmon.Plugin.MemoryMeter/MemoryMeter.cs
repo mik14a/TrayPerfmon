@@ -14,6 +14,12 @@ namespace TrayPerfmon.Plugin.MemoryMeter
     [Plugin("MemoryMeter", "Display memory usage")]
     public class MemoryMeter : NotifyIconPlugin
     {
+        // Dark-editor palette (Dracula accents — higher contrast than One Dark).
+        public string Low { get; set; } = "#50fa7b";
+        public string Middle { get; set; } = "#f1fa8c";
+        public string High { get; set; } = "#ff5555";
+        public string Fill { get; set; } = "#08000000";
+
         protected override string BalloonTipText {
             get {
                 var committed = (Committed * 100).ToString("0.00");
@@ -23,17 +29,10 @@ namespace TrayPerfmon.Plugin.MemoryMeter
                 return $"{committed}% Committed / {use}% Use ({available} / {max})";
             }
         }
+        protected float Committed { get; private set; }
+        protected float Use { get; private set; }
 
         const int FramesPerSecond = 15;
-
-        // Dark-editor palette (Dracula accents — higher contrast than One Dark).
-        public string Low { get; set; } = "#50fa7b";
-        public string Middle { get; set; } = "#f1fa8c";
-        public string High { get; set; } = "#ff5555";
-
-        protected float Committed { get; private set; }
-
-        protected float Use { get; private set; }
 
         public MemoryMeter()
             : base(1000 / FramesPerSecond) {
@@ -52,12 +51,14 @@ namespace TrayPerfmon.Plugin.MemoryMeter
             foreach (var range in _range) {
                 range.Value.Dispose();
             }
+            _fill?.Dispose();
             var converter = new ColorConverter();
             _range = [
-                KeyValuePair.Create(0.5f, new SolidBrush((Color)converter.ConvertFrom(Low)) as Brush),
-                KeyValuePair.Create(0.75f, new SolidBrush((Color)converter.ConvertFrom(Middle)) as Brush),
-                KeyValuePair.Create(1f, new SolidBrush((Color)converter.ConvertFrom(High)) as Brush)
+                new(0.5f, new SolidBrush((Color)converter.ConvertFrom(Low))),
+                new(0.75f, new SolidBrush((Color)converter.ConvertFrom(Middle))),
+                new(1f, new SolidBrush((Color)converter.ConvertFrom(High)))
             ];
+            _fill = new SolidBrush((Color)converter.ConvertFrom(Fill));
         }
 
         protected override void Clear(Graphics graphics) {
@@ -78,8 +79,7 @@ namespace TrayPerfmon.Plugin.MemoryMeter
 
             void DrawMeter(Graphics g, float v, RectangleF r) {
                 var brush = _range.First(range => v <= range.Key).Value;
-                // Unused arc: semi-transparent disc (circle-only icon is fine; no square plate).
-                g.FillEllipse(_discBrush, r);
+                g.FillEllipse(_fill, r); // Unused arc: semi-transparent disc (circle-only icon is fine; no square plate).
                 g.FillPie(brush, r.X, r.Y, r.Width, r.Height, 90f, 360f * v);
             }
         }
@@ -92,16 +92,16 @@ namespace TrayPerfmon.Plugin.MemoryMeter
                 foreach (var range in _range) {
                     range.Value.Dispose();
                 }
-                _discBrush.Dispose();
+                _fill?.Dispose();
             }
             base.Dispose(disposing);
         }
 
-        PerformanceCounter[] _performanceCounter = [];
-        ulong _available;
         readonly ulong _max;
+        ulong _available; // Cached value for balloon tip text; updated in Draw().
+
+        PerformanceCounter[] _performanceCounter = [];
         KeyValuePair<float, Brush>[] _range = [];
-        /// <summary>Unused portion of each meter disc (alpha tuned only for MemoryMeter).</summary>
-        readonly SolidBrush _discBrush = new(Color.FromArgb(0x08, 0x00, 0x00, 0x00));
+        Brush _fill;
     }
 }

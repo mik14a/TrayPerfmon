@@ -13,23 +13,23 @@ namespace TrayPerfmon.Plugin.GpuUsage
     {
         /// <summary>Adapter key matching GPU Engine instances (e.g. luid_0x..._phys_0).</summary>
         public string AdapterInstance { get; set; }
-
         /// <summary>Engine type suffix (e.g. 3D, Copy, Compute 0) — Task Manager style.</summary>
         public string EngineType { get; set; }
+        // Dark-editor palette (Dracula accents — higher contrast than One Dark).
+        public string Low { get; set; } = "#50fa7b";
+        public string Middle { get; set; } = "#f1fa8c";
+        public string High { get; set; } = "#ff5555";
+        public string Fill { get; set; } = "#08000000";
 
-        protected override string BalloonTipText => $"{_gpuName} [{EngineType}]: {_percent:0.0}%";
+        protected override string BalloonTipText => $"{GpuName} [{EngineType}]: {Percent:0.0}%";
+        protected string GpuName { get; private set; } = "GPU";
+        protected float Percent { get; private set; }
+        protected override bool HasSettings => true;
 
         const int FramesPerSecond = 15;
         const int RefreshInstanceMs = 1000;
         const float EmaAlpha = 0.3f; // EMA weight on the new sample (higher = snappier).
         const string EngTypeMarker = "_engtype_";
-
-        // Dark-editor palette (Dracula accents — higher contrast than One Dark).
-        public string Low { get; set; } = "#50fa7b";
-        public string Middle { get; set; } = "#f1fa8c";
-        public string High { get; set; } = "#ff5555";
-
-        protected override bool HasSettings => true;
 
         public GpuUsage()
             : base(1000 / FramesPerSecond) {
@@ -44,9 +44,9 @@ namespace TrayPerfmon.Plugin.GpuUsage
                     ? adapters.First()
                     : adapters.FirstOrDefault(g => g.InstanceName == AdapterInstance) ?? adapters.First();
                 AdapterInstance = gpu.InstanceName;
-                _gpuName = gpu.Name;
+                GpuName = gpu.Name;
             } else {
-                _gpuName = string.IsNullOrEmpty(AdapterInstance) ? "GPU" : AdapterInstance;
+                GpuName = string.IsNullOrEmpty(AdapterInstance) ? "GPU" : AdapterInstance;
             }
 
             var instances = GetEngineInstances();
@@ -70,11 +70,11 @@ namespace TrayPerfmon.Plugin.GpuUsage
                 new(75, new SolidBrush((Color)converter.ConvertFrom(Middle))),
                 new(100, new SolidBrush((Color)converter.ConvertFrom(High)))
             ];
+            _fill = (Color)converter.ConvertFrom(Fill);
         }
 
         protected override void Clear(Graphics graphics) {
-            // 1px sparkline; slightly stronger plate than CpuGraph so thin bars stay readable.
-            graphics.Clear(Color.FromArgb(0x08, 0x00, 0x00, 0x00));
+            graphics.Clear(_fill);
         }
 
         protected override void Draw(Graphics graphics) {
@@ -98,8 +98,8 @@ namespace TrayPerfmon.Plugin.GpuUsage
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
             var size = IconSize;
             var sample = Math.Clamp(sum, 0f, 100f);
-            _percent = EmaAlpha * sample + (1f - EmaAlpha) * _percent;
-            _history.Enqueue(_percent);
+            Percent = EmaAlpha * sample + (1f - EmaAlpha) * Percent;
+            _history.Enqueue(Percent);
             while (size < _history.Count) {
                 _history.Dequeue();
             }
@@ -173,8 +173,7 @@ namespace TrayPerfmon.Plugin.GpuUsage
         readonly Queue<float> _history;
 
         DateTime _lastRefresh;
-        string _gpuName = "GPU";
-        float _percent;
         KeyValuePair<int, Brush>[] _range = [];
+        Color _fill;
     }
 }
