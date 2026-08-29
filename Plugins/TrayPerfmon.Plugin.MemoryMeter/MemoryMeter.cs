@@ -67,19 +67,21 @@ namespace TrayPerfmon.Plugin.MemoryMeter
         }
 
         protected override void Draw(Graphics graphics) {
+            graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            graphics.CompositingMode = CompositingMode.SourceCopy;
+
             var value = _performanceCounter.Select(counter => counter.NextValue()).ToArray();
             _available = (ulong)value[1];  // Available Bytes
-            graphics.SmoothingMode = SmoothingMode.AntiAlias;
             Committed = Math.Clamp(value[0] / 100f, 0f, 1f);
             Use = Math.Clamp(1f - (float)_available / _max, 0f, 1f);
             var size = IconSize;
-            var bounds = new RectangleF(0, 0, size, size);
+            var bounds = new RectangleF(0, 0, size - 1, size - 1);
             DrawMeter(graphics, Committed, bounds);
             DrawMeter(graphics, Use, RectangleF.Inflate(bounds, -bounds.Width / 5, -bounds.Height / 5));
 
             void DrawMeter(Graphics g, float v, RectangleF r) {
-                var brush = _range.First(range => v <= range.Key).Value;
                 g.FillEllipse(_fill, r); // Unused arc: semi-transparent disc (circle-only icon is fine; no square plate).
+                var brush = _range.First(range => v <= range.Key).Value;
                 g.FillPie(brush, r.X, r.Y, r.Width, r.Height, 90f, 360f * v);
             }
         }
