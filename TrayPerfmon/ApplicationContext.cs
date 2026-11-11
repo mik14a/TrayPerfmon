@@ -25,6 +25,7 @@ namespace TrayPerfmon
             ContextMenuStrip contextMenuStrip = new();
             contextMenuStrip.Items.AddRange(toolStripItems);
             contextMenuStrip.Items.Add(new ToolStripSeparator());
+            contextMenuStrip.Items.Add(new ToolStripMenuItem("O&pen", null, OpenHandler));
             contextMenuStrip.Items.Add(new ToolStripMenuItem("S&ave", null, SaveHandler));
             contextMenuStrip.Items.Add(new ToolStripMenuItem("E&xit", null, ExitHandler));
 
@@ -43,7 +44,7 @@ namespace TrayPerfmon
 
             if (Directory.Exists(Repository)) {
                 foreach (var file in Directory.EnumerateFiles(Repository, "*.xml")) {
-                    var name = Path.GetFileNameWithoutExtension(file);
+                    var name = GetFileNameWithoutExtension(file);
                     if (plugins.TryGetValue(name, out var info)) {
                         var serializer = new XmlSerializer(info.Type);
                         using var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -52,6 +53,11 @@ namespace TrayPerfmon
                         _plugins.Add(plugin);
                     }
                 }
+            }
+
+            static string GetFileNameWithoutExtension(string path) {
+                var fileName = Path.GetFileNameWithoutExtension(path);
+                return Path.HasExtension(fileName) ? GetFileNameWithoutExtension(fileName) : fileName;
             }
         }
 
@@ -62,6 +68,12 @@ namespace TrayPerfmon
             var plugin = pluginInfo.CreateInstance();
             plugin.Construct();
             _plugins.Add(plugin);
+        }
+
+        void OpenHandler(object sender, EventArgs e) {
+            if (Directory.Exists(Repository)) {
+                Process.Start("explorer.exe", Repository);
+            }
         }
 
         void SaveHandler(object sender, EventArgs e) {
