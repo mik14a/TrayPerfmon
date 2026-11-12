@@ -13,7 +13,7 @@ namespace TrayPerfmon.Plugin.CpuGrid
     /// which stays readable on high core count CPUs where per-core gauges collapse.
     /// </summary>
     [Plugin("CpuGrid", "Draw CPU usage as heatmap grid")]
-    public class CpuGrid : NotifyIconPlugin
+    public partial class CpuGrid : NotifyIconPlugin
     {
         // Dark-editor palette (Dracula accents — higher contrast than One Dark).
         public string Low { get; set; } = "#50fa7b";
@@ -54,7 +54,7 @@ namespace TrayPerfmon.Plugin.CpuGrid
             _brushes = Enumerable.Range(0, PaletteSteps + 1)
                 .Select(step => {
                     var t = (float)step / PaletteSteps;
-                    var heat = t <= 0.5f ? Lerp(low, middle, t * 2) : Lerp(middle, high, (t - 0.5f) * 2);
+                    var heat = 0.5f >= t ? Lerp(low, middle, t * 2) : Lerp(middle, high, (t - 0.5f) * 2);
                     return new SolidBrush(Lerp(dim, heat, Math.Min(1f, t * 4)));
                 })
                 .ToArray();
@@ -62,10 +62,11 @@ namespace TrayPerfmon.Plugin.CpuGrid
             _cells = string.Equals(GridMode, "Logical", StringComparison.OrdinalIgnoreCase)
                 ? BuildLogicalCells()
                 : BuildPhysicalCells() ?? BuildLogicalCells();
-            // Counter instances only exist for the current processor group.
+            // Counter instances only exist for the current processor group, so cells
+            // pointing at other groups' logical CPUs are dropped here (not guarded later).
             _cells = _cells
-                .Select(cell => cell.Where(index => index >= 0 && index < Environment.ProcessorCount).ToList())
-                .Where(cell => cell.Count > 0)
+                .Select(cell => cell.Where(index => 0 <= index && index < Environment.ProcessorCount).ToList())
+                .Where(cell => 0 < cell.Count)
                 .ToList();
             foreach (var cell in _performanceCounter) {
                 foreach (var counter in cell) {
@@ -90,7 +91,8 @@ namespace TrayPerfmon.Plugin.CpuGrid
             for (var i = 0; i < _cells.Count; ++i) {
                 var counters = _performanceCounter[i];
                 var sum = counters.Sum(counter => counter.NextValue());
-                var sample = sum / counters.Length;
+                // Counter readings are external input; normalize into the palette domain once here.
+                var sample = Math.Clamp(sum / counters.Length, 0f, 100f);
                 value[i] = _seeded ? _smoothed[i] + Alpha * (sample - _smoothed[i]) : sample;
                 _smoothed[i] = value[i];
             }
@@ -99,7 +101,7 @@ namespace TrayPerfmon.Plugin.CpuGrid
             MaxIndex = 0;
             Max = value[0];
             for (var i = 1; i < value.Length; ++i) {
-                if (value[i] > Max) {
+                if (Max < value[i]) {
                     Max = value[i];
                     MaxIndex = i;
                 }
@@ -107,20 +109,23 @@ namespace TrayPerfmon.Plugin.CpuGrid
 
             var size = IconSize;
             var count = value.Length;
-            var columns = (int)Math.Ceiling(Math.Sqrt(count));
+            // Floor the side so the grid leans tall (12 CPUs → 3 columns x 4 rows)
+            // rather than leaving an empty strip at the bottom.
+            var columns = (int)Math.Floor(Math.Sqrt(count));
             var rows = (int)Math.Ceiling((double)count / columns);
-            var cell = Math.Max(1, size / columns);
+            // Cells stretch independently so the grid reaches the icon edges instead
+            // of square cells wasting a band of pixels.
+            var cellWidth = size / columns;
+            var cellHeight = size / rows;
             // Gaps only help once a cell is wide enough to still show one lit pixel.
-            var gap = cell >= 3 ? 1 : 0;
-            var offsetY = (size - rows * cell) / 2;
+            var gap = 3 <= Math.Min(cellWidth, cellHeight) ? 1 : 0;
+            var offsetX = (size - columns * cellWidth) / 2;
+            var offsetY = (size - rows * cellHeight) / 2;
             for (var i = 0; i < count; ++i) {
-                var x = i % columns * cell;
-                var y = offsetY + i / columns * cell;
-                if (x + cell > size || y + cell > size) {
-                    continue;
-                }
-                var step = (int)Math.Round(Math.Clamp(value[i], 0f, 100f) / 100f * PaletteSteps);
-                graphics.FillRectangle(_brushes[step], x, y, cell - gap, cell - gap);
+                var x = offsetX + i % columns * cellWidth;
+                var y = offsetY + i / columns * cellHeight;
+                var step = (int)Math.Round(value[i] / 100f * PaletteSteps);
+                graphics.FillRectangle(_brushes[step], x, y, cellWidth - gap, cellHeight - gap);
             }
         }
 
@@ -169,13 +174,13 @@ namespace TrayPerfmon.Plugin.CpuGrid
                         // Size 48 (Windows 11): trailing GROUP_AFFINITY { mask @32, group @40 },
                         // efficiency class byte @8; the legacy mask slot is zero there.
                         var recordSize = Marshal.ReadInt32(buffer, (int)offset + 4);
-                        if (recordSize < 24) {
+                        if (24 > recordSize) {
                             break;
                         }
                         long mask;
                         int group;
                         int efficiency;
-                        if (recordSize >= 48) {
+                        if (48 <= recordSize) {
                             mask = Marshal.ReadInt64(buffer, (int)offset + 32);
                             group = (ushort)Marshal.ReadInt16(buffer, (int)offset + 40);
                             efficiency = Marshal.ReadByte(buffer, (int)offset + 8);
@@ -195,7 +200,7 @@ namespace TrayPerfmon.Plugin.CpuGrid
                             }
                             cell.Add(index);
                         }
-                        if (cell.Count > 0) {
+                        if (0 < cell.Count) {
                             cells.Add((efficiency, cell[0], cell));
                         }
                         offset += (uint)recordSize;
@@ -210,7 +215,7 @@ namespace TrayPerfmon.Plugin.CpuGrid
                     cells.Sort((a, b) => a.Efficiency != b.Efficiency
                         ? b.Efficiency.CompareTo(a.Efficiency)
                         : a.First.CompareTo(b.First));
-                    return cells.Count > 0 ? cells.Select(cell => cell.Cell).ToList() : null;
+                    return 0 < cells.Count ? cells.Select(cell => cell.Cell).ToList() : null;
                 } finally {
                     Marshal.FreeHGlobal(buffer);
                 }
