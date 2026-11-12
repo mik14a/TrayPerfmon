@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
     <!-- SystemAware so tray icons are drawn at real small-icon pixel size (sharp on high-DPI). -->
